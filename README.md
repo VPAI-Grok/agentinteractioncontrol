@@ -13,7 +13,7 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 - reference consumer proof showing external resolution by contract instead of selector-first fallbacks
 - explicit `@aicorg/*/client` entrypoints for Next/RSC-aware consumption of React-facing packages
 - coding-agent onboarding templates plus `aic init` and `aic doctor` for app repos adopting AIC
-- alpha npm packaging prep for the core `@aicorg/*` publish wave, including tarball smoke tests and a release workflow
+- alpha npm packages are live for the core `@aicorg/*` publish wave, with tarball smoke tests and a release workflow backing the release process
 
 ## Not Guaranteed Yet
 
@@ -21,7 +21,7 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 - zero-touch onboarding of dynamic codebases
 - heuristic repo mutation
 - non-React production coverage
-- live npm alpha publication from this repo has not happened yet
+- stable npm GA publication has not happened yet
 
 ## Start Here
 
@@ -36,15 +36,15 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 ## Repo Status
 
 - Public GitHub launch ready
-- First-wave packages are prepared for alpha npm publishing
-- Actual npm publication still requires a release run with npm credentials
+- First-wave `@aicorg/*` packages are published to npm under the `alpha` tag
+- Further package releases still go through the GitHub publish workflow
 
 ## npm Alpha Packaging
 
 - The first npm wave targets the core publishable packages under the existing `@aicorg/*` scope.
 - `@aicorg/devtools` and the example apps remain repo-only for now.
 - Package release plumbing uses Changesets plus a manual GitHub Actions publish workflow.
-- See [npm-packages.md](./docs/npm-packages.md) for the package matrix and install targets after publish.
+- See [npm-packages.md](./docs/npm-packages.md) for the published package matrix and install commands.
 
 ## What Exists Now
 

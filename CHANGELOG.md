@@ -8,11 +8,11 @@
 - Example apps now prove confirmation, validation, execution, recovery, entity, and workflow metadata.
 - Bootstrap providers hardened with normalized errors, retries, and timeout controls.
 - Reference consumer proof harness added to show external consumption without selector-first fallbacks.
-- Alpha npm packaging readiness added for the first publish wave, including package metadata, release tooling, and tarball smoke tests.
+- First alpha npm publish completed for the first `@aicorg/*` package wave, with package metadata, release tooling, and tarball smoke tests in place.
 
 ### Current Boundaries
 
 - `@aicorg/devtools` and example apps remain private.
 - Supported target is owned React/Next/Vite apps.
 - Dynamic inference and heuristic repo mutation remain out of scope.
-- Actual npm publication still requires a release run with credentials.
+- Stable GA npm publication is still pending.

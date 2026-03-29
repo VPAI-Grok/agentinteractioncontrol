@@ -1,8 +1,8 @@
 # npm Packages
 
-This repo is preparing an alpha npm release for the core `@aicorg/*` packages.
+The core `@aicorg/*` packages are now published to npm under the `alpha` tag.
 
-## Planned Alpha Publish Wave
+## Published Alpha Wave
 
 | Package | Purpose |
 | --- | --- |
@@ -26,7 +26,7 @@ This repo is preparing an alpha npm release for the core `@aicorg/*` packages.
 - `examples/*`
   Stay private as demos, proof surfaces, and test fixtures.
 
-## Install Targets After The First Alpha Publish
+## Install Targets
 
 Core runtime and React adoption:
 
@@ -54,6 +54,6 @@ pnpm add @aicorg/ai-bootstrap @aicorg/ai-bootstrap-http @aicorg/ai-bootstrap-ope
 
 ## Release Notes
 
-- The first npm release is intended to use an alpha tag.
+- The current npm release uses the `alpha` tag.
 - Workspace examples and deferred packages are intentionally not published.
 - Package tarballs are validated with local smoke tests before any publish step runs in CI.
