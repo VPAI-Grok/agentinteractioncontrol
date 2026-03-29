@@ -1,0 +1,73 @@
+{
+  "spec": "aic/0.1",
+  "manifest_version": "0.1.0",
+  "updated_at": "2026-03-28T00:00:00.000Z",
+  "page": {
+    "url": "https://demo.example/checkout"
+  },
+  "view": {
+    "view_id": "next.checkout"
+  },
+  "elements": [
+    {
+      "id": "customer.archive",
+      "label": "Archive customer",
+      "description": "Archive customer",
+      "role": "dialog_trigger",
+      "actions": [
+        {
+          "name": "click",
+          "target": "customer.archive",
+          "type": "element_action"
+        }
+      ],
+      "risk": "high",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from src/App.tsx:39"
+      ]
+    },
+    {
+      "id": "customer.archive.dialog",
+      "label": "Archive customer dialog",
+      "description": "Archive customer dialog",
+      "role": "dialog",
+      "actions": [
+        {
+          "name": "read",
+          "target": "customer.archive.dialog",
+          "type": "element_action"
+        }
+      ],
+      "risk": "medium",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from src/App.tsx:48"
+      ]
+    },
+    {
+      "id": "customer.view",
+      "label": "View customer",
+      "description": "View customer",
+      "role": "tab",
+      "actions": [
+        {
+          "name": "select",
+          "target": "customer.view",
+          "type": "element_action"
+        }
+      ],
+      "risk": "low",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from src/App.tsx:57"
+      ]
+    }
+  ]
+}

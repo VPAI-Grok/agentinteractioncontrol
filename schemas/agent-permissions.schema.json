@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/agent-permissions.schema.json",
+  "title": "AIC Permissions Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["spec", "generated_at", "riskBands"],
+  "properties": {
+    "spec": {
+      "const": "aic/0.1"
+    },
+    "manifest_version": {
+      "type": "string"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "mutationPolicy": {
+      "type": "string"
+    },
+    "forbiddenActions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reauthRequiredFor": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "riskBands": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["low", "medium", "high", "critical"],
+      "properties": {
+        "low": {
+          "$ref": "#/$defs/riskBandPolicy"
+        },
+        "medium": {
+          "$ref": "#/$defs/riskBandPolicy"
+        },
+        "high": {
+          "$ref": "#/$defs/riskBandPolicy"
+        },
+        "critical": {
+          "$ref": "#/$defs/riskBandPolicy"
+        }
+      }
+    },
+    "actionPolicies": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/actionPolicy"
+      }
+    }
+  },
+  "$defs": {
+    "risk": {
+      "enum": ["low", "medium", "high", "critical"]
+    },
+    "riskBandPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requiresConfirmation"],
+      "properties": {
+        "requiresConfirmation": {
+          "type": "boolean"
+        },
+        "audit": {
+          "type": "boolean"
+        }
+      }
+    },
+    "actionPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requiresConfirmation": {
+          "type": "boolean"
+        },
+        "audit": {
+          "type": "boolean"
+        },
+        "risk": {
+          "$ref": "#/$defs/risk"
+        },
+        "roleRequirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

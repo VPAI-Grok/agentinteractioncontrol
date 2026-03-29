@@ -1,0 +1,40 @@
+{
+  "added": [],
+  "changed": [
+    {
+      "after": {
+        "name": "Demo Suite"
+      },
+      "before": {
+        "name": "Demo App"
+      },
+      "field": "app"
+    },
+    {
+      "after": {
+        "actions": "/.well-known/agent/actions/v2",
+        "permissions": "/.well-known/agent-permissions.json",
+        "ui": "/.well-known/agent/ui",
+        "workflows": "/.well-known/agent-workflows.json"
+      },
+      "before": {
+        "actions": "/.well-known/agent/actions",
+        "permissions": "/.well-known/agent-permissions.json",
+        "ui": "/.well-known/agent/ui",
+        "workflows": "/.well-known/agent-workflows.json"
+      },
+      "field": "endpoints"
+    },
+    {
+      "after": [
+        "after"
+      ],
+      "before": [
+        "before"
+      ],
+      "field": "notes"
+    }
+  ],
+  "kind": "discovery",
+  "removed": []
+}

@@ -1,0 +1,11 @@
+{
+  "added": [
+    "customer.view"
+  ],
+  "changed": [],
+  "kind": "ui",
+  "removed": [
+    "customer.archive"
+  ],
+  "topLevelChanged": []
+}

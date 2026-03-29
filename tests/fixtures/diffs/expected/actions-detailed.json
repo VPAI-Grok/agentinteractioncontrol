@@ -1,0 +1,20 @@
+{
+  "added": [
+    "customer.view:navigate"
+  ],
+  "changed": [
+    {
+      "changes": [
+        {
+          "after": 2000,
+          "before": 1000,
+          "field": "estimated_latency_ms"
+        }
+      ],
+      "key": "customer.archive:archive"
+    }
+  ],
+  "kind": "actions",
+  "removed": [],
+  "topLevelChanged": []
+}

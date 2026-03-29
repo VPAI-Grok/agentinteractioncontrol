@@ -1,0 +1,568 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/agent-ui.schema.json",
+  "title": "AIC Runtime UI Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["spec", "page", "view", "elements", "updated_at"],
+  "properties": {
+    "spec": {
+      "const": "aic/0.1"
+    },
+    "manifest_version": {
+      "type": "string"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "page": {
+      "$ref": "#/$defs/page"
+    },
+    "view": {
+      "$ref": "#/$defs/view"
+    },
+    "user_context": {
+      "$ref": "#/$defs/jsonObject"
+    },
+    "elements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/element"
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/relationship"
+      }
+    }
+  },
+  "$defs": {
+    "primitive": {
+      "type": ["boolean", "number", "string", "null"]
+    },
+    "jsonValue": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/primitive"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/jsonValue"
+          }
+        },
+        {
+          "$ref": "#/$defs/jsonObject"
+        }
+      ]
+    },
+    "jsonObject": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/jsonValue"
+      }
+    },
+    "risk": {
+      "enum": ["low", "medium", "high", "critical"]
+    },
+    "role": {
+      "enum": [
+        "button",
+        "link",
+        "searchbox",
+        "input",
+        "textarea",
+        "select",
+        "option",
+        "checkbox",
+        "radio",
+        "switch",
+        "tab",
+        "tabpanel",
+        "menu",
+        "menuitem",
+        "dialog_trigger",
+        "dialog",
+        "form",
+        "upload",
+        "grid",
+        "row",
+        "cell",
+        "listbox",
+        "combobox",
+        "table",
+        "generic"
+      ]
+    },
+    "riskFlag": {
+      "enum": [
+        "destructive",
+        "financial",
+        "security_sensitive",
+        "privacy_sensitive",
+        "external_side_effect",
+        "irreversible"
+      ]
+    },
+    "confirmationType": {
+      "enum": [
+        "inline_modal",
+        "browser_dialog",
+        "manual_phrase",
+        "step_up_auth",
+        "out_of_band"
+      ]
+    },
+    "actionType": {
+      "enum": ["element_action", "semantic_action"]
+    },
+    "provenanceSource": {
+      "enum": ["authored", "inferred", "ai_suggested"]
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url"],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "view": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["view_id"],
+      "properties": {
+        "view_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "navigation_context": {
+          "type": "string"
+        },
+        "route_pattern": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "elementAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/actionType"
+        },
+        "contract_ref": {
+          "type": "string"
+        }
+      }
+    },
+    "elementState": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "busy": {
+          "type": "boolean"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "expanded": {
+          "type": "boolean"
+        },
+        "hidden": {
+          "type": "boolean"
+        },
+        "row_count": {
+          "type": "number"
+        },
+        "selected": {
+          "type": "boolean"
+        },
+        "value": {
+          "$ref": "#/$defs/primitive"
+        },
+        "virtualized": {
+          "type": "boolean"
+        },
+        "visible": {
+          "type": "boolean"
+        }
+      }
+    },
+    "confirmation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/confirmationType"
+        },
+        "prompt_template": {
+          "type": "string"
+        },
+        "summary_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "requires_manual_phrase": {
+          "type": "boolean"
+        },
+        "reusable_for_batch": {
+          "type": "boolean"
+        },
+        "expires_in_seconds": {
+          "type": "number"
+        }
+      }
+    },
+    "completionSignal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "value"],
+      "properties": {
+        "type": {
+          "enum": ["toast", "toast_or_navigation", "navigation", "dialog", "state_change", "custom"]
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "format": {
+          "type": "string"
+        },
+        "pattern": {
+          "type": "string"
+        },
+        "min_length": {
+          "type": "number"
+        },
+        "max_length": {
+          "type": "number"
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "server_unique": {
+          "type": "boolean"
+        },
+        "cross_field_dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/primitive"
+          }
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/primitive"
+          }
+        }
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "error_code": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "retry_after_ms": {
+          "type": "number"
+        },
+        "partial_state_changed": {
+          "type": "boolean"
+        },
+        "human_escalation_required": {
+          "type": "boolean"
+        },
+        "recovery": {
+          "type": "string"
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "async_job_id": {
+          "type": "string"
+        },
+        "busy_when": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ready_when": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "settled_when": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "estimated_latency_ms": {
+          "type": "number"
+        },
+        "retry_after_ms": {
+          "type": "number"
+        },
+        "poll_endpoint": {
+          "type": "string"
+        },
+        "invalidation_triggers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "entityRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "entity_type"],
+      "properties": {
+        "entity_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entity_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entity_label": {
+          "type": "string"
+        },
+        "parent_entity_id": {
+          "type": "string"
+        },
+        "row_key": {
+          "type": "string"
+        },
+        "backing_resource": {
+          "type": "string"
+        }
+      }
+    },
+    "metadataProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source"],
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/provenanceSource"
+        },
+        "confidence_score": {
+          "type": "number"
+        },
+        "requires_human_review_if_below": {
+          "type": "number"
+        },
+        "ambiguity_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "authored": {
+          "$ref": "#/$defs/metadataProvenance"
+        },
+        "inferred": {
+          "$ref": "#/$defs/metadataProvenance"
+        },
+        "ai_suggested": {
+          "$ref": "#/$defs/metadataProvenance"
+        }
+      }
+    },
+    "selectors": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "css": {
+          "type": "string"
+        },
+        "testId": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "element": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "role", "actions", "risk", "state"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/$defs/role"
+        },
+        "parent_id": {
+          "type": "string"
+        },
+        "workflow_ref": {
+          "type": "string"
+        },
+        "actions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/elementAction"
+          }
+        },
+        "risk": {
+          "$ref": "#/$defs/risk"
+        },
+        "risk_flags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/riskFlag"
+          }
+        },
+        "state": {
+          "$ref": "#/$defs/elementState"
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "requires_confirmation": {
+          "type": "boolean"
+        },
+        "confirmation": {
+          "$ref": "#/$defs/confirmation"
+        },
+        "execution": {
+          "$ref": "#/$defs/execution"
+        },
+        "recovery": {
+          "$ref": "#/$defs/recovery"
+        },
+        "validation": {
+          "$ref": "#/$defs/validation"
+        },
+        "entity_ref": {
+          "$ref": "#/$defs/entityRef"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "selectors": {
+          "$ref": "#/$defs/selectors"
+        }
+      }
+    },
+    "relationship": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "kind", "to"],
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": ["contains", "controls", "describes", "relates_to"]
+        },
+        "to": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

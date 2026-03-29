@@ -1,0 +1,27 @@
+{
+  "name": "@aic/devtools",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "main": "./dist/devtools/src/index.js",
+  "types": "./dist/devtools/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/devtools/src/index.d.ts",
+      "import": "./dist/devtools/src/index.js",
+      "default": "./dist/devtools/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node ./scripts/sync-extension-assets.mjs",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@aic/runtime": "workspace:*",
+    "@aic/sdk-react": "workspace:*",
+    "@aic/spec": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  }
+}

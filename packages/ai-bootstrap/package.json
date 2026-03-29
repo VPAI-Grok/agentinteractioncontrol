@@ -1,0 +1,23 @@
+{
+  "name": "@aic/ai-bootstrap",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "main": "./dist/ai-bootstrap/src/index.js",
+  "types": "./dist/ai-bootstrap/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/ai-bootstrap/src/index.d.ts",
+      "import": "./dist/ai-bootstrap/src/index.js",
+      "default": "./dist/ai-bootstrap/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@aic/spec": "workspace:*",
+    "playwright": "^1.52.0"
+  }
+}

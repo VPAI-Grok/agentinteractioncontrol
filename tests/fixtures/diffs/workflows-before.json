@@ -1,0 +1,22 @@
+{
+  "spec": "aic/0.1",
+  "manifest_version": "0.1.0",
+  "generated_at": "2026-03-28T00:00:00.000Z",
+  "workflows": [
+    {
+      "id": "customer.archive",
+      "title": "Archive customer",
+      "entry_points": [
+        "customer.archive"
+      ],
+      "steps": [
+        {
+          "id": "archive-click",
+          "type": "element_action",
+          "action": "click",
+          "target": "customer.archive"
+        }
+      ]
+    }
+  ]
+}

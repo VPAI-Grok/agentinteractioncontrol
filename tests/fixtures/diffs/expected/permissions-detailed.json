@@ -1,0 +1,45 @@
+{
+  "added": [],
+  "changed": [
+    {
+      "after": [
+        "customer.delete"
+      ],
+      "before": null,
+      "field": "forbiddenActions"
+    },
+    {
+      "after": {
+        "critical": {
+          "requiresConfirmation": true
+        },
+        "high": {
+          "requiresConfirmation": true
+        },
+        "low": {
+          "requiresConfirmation": false
+        },
+        "medium": {
+          "requiresConfirmation": true
+        }
+      },
+      "before": {
+        "critical": {
+          "requiresConfirmation": true
+        },
+        "high": {
+          "requiresConfirmation": true
+        },
+        "low": {
+          "requiresConfirmation": false
+        },
+        "medium": {
+          "requiresConfirmation": false
+        }
+      },
+      "field": "riskBands"
+    }
+  ],
+  "kind": "permissions",
+  "removed": []
+}

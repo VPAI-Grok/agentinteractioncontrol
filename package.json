@@ -1,0 +1,36 @@
+{
+  "name": "aic",
+  "private": true,
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VPAI-Grok/agentinteractioncontrol.git"
+  },
+  "homepage": "https://github.com/VPAI-Grok/agentinteractioncontrol",
+  "bugs": {
+    "url": "https://github.com/VPAI-Grok/agentinteractioncontrol/issues"
+  },
+  "packageManager": "pnpm@10.8.1",
+  "scripts": {
+    "build": "pnpm -r --if-present build",
+    "check": "pnpm -r --if-present check",
+    "dev": "pnpm -r --if-present --parallel dev",
+    "lint": "pnpm -r --if-present lint",
+    "test": "pnpm build && pnpm test:contracts",
+    "test:contracts": "node --test tests/*.test.mjs",
+    "test:goldens": "pnpm build && node tests/goldens.mjs verify",
+    "test:update-goldens": "pnpm build && node tests/goldens.mjs update"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "pnpm": "10.8.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-test-renderer": "^19.0.0",
+    "turbo": "^2.5.0",
+    "typescript": "^5.8.2"
+  }
+}

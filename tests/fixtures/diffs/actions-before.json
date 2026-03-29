@@ -1,0 +1,25 @@
+{
+  "spec": "aic/0.1",
+  "manifest_version": "0.1.0",
+  "generated_at": "2026-03-28T00:00:00.000Z",
+  "actions": [
+    {
+      "name": "archive",
+      "title": "Archive customer",
+      "target": "customer.archive",
+      "preconditions": [],
+      "postconditions": [],
+      "side_effects": [],
+      "idempotent": false,
+      "undoable": false,
+      "estimated_latency_ms": 1000,
+      "completion_signal": {
+        "type": "state_change",
+        "value": "customer.archive.completed = true"
+      },
+      "failure_modes": [
+        "unknown_failure"
+      ]
+    }
+  ]
+}

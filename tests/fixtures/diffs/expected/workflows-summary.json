@@ -1,0 +1,16 @@
+{
+  "added": [
+    "customer.view"
+  ],
+  "changed": [
+    {
+      "fields": [
+        "title"
+      ],
+      "key": "customer.archive"
+    }
+  ],
+  "kind": "workflows",
+  "removed": [],
+  "topLevelChanged": []
+}

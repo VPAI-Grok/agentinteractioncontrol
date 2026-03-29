@@ -1,0 +1,24 @@
+{
+  "name": "@aic/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "main": "./dist/cli/src/index.js",
+  "types": "./dist/cli/src/index.d.ts",
+  "bin": {
+    "aic": "./dist/cli/src/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@aic/ai-bootstrap": "workspace:*",
+    "@aic/ai-bootstrap-http": "workspace:*",
+    "@aic/ai-bootstrap-openai": "workspace:*",
+    "@aic/automation-core": "workspace:*",
+    "@aic/plugin-vite": "workspace:*",
+    "@aic/runtime": "workspace:*",
+    "@aic/spec": "workspace:*"
+  }
+}

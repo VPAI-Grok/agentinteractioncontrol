@@ -1,0 +1,26 @@
+{
+  "name": "@aic/integrations-shadcn",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "main": "./dist/integrations-shadcn/src/index.js",
+  "types": "./dist/integrations-shadcn/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/integrations-shadcn/src/index.d.ts",
+      "import": "./dist/integrations-shadcn/src/index.js",
+      "default": "./dist/integrations-shadcn/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@aic/sdk-react": "workspace:*",
+    "@aic/spec": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  }
+}

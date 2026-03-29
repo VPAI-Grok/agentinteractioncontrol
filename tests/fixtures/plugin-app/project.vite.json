@@ -1,0 +1,11 @@
+{
+  "appName": "Demo CRM",
+  "framework": "vite",
+  "generatedAt": "2026-03-28T00:00:00.000Z",
+  "hmr": true,
+  "notes": ["fixture project"],
+  "projectRoot": "./",
+  "updatedAt": "2026-03-28T00:00:00.000Z",
+  "viewId": "crm.root",
+  "viewUrl": "https://demo.example/customers"
+}

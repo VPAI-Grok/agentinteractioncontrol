@@ -1,0 +1,82 @@
+{
+  "appName": "AIC CRM Demo",
+  "framework": "vite",
+  "generatedAt": "2026-03-28T00:00:00.000Z",
+  "hmr": true,
+  "notes": ["example project", "crm proof harness"],
+  "permissions": {
+    "actionPolicies": {
+      "customer.archive": {
+        "requiresConfirmation": true,
+        "risk": "high",
+        "roleRequirements": [
+          "billing_manager"
+        ]
+      },
+      "customer.send_renewal_email": {
+        "risk": "medium"
+      }
+    }
+  },
+  "projectRoot": ".",
+  "updatedAt": "2026-03-28T00:00:00.000Z",
+  "viewId": "crm.customers",
+  "viewUrl": "https://demo.example/customers",
+  "workflows": [
+    {
+      "entry_points": [
+        "customer.archive"
+      ],
+      "human_approval_steps": [
+        "customer.archive.review"
+      ],
+      "id": "customer.archive",
+      "steps": [
+        {
+          "action": "click",
+          "id": "customer.archive.review",
+          "target": "customer.archive",
+          "type": "element_action"
+        }
+      ],
+      "title": "Archive Customer"
+    },
+    {
+      "completion_signal": {
+        "type": "toast",
+        "value": "toast.visible"
+      },
+      "entry_points": [
+        "customer.send_renewal_email"
+      ],
+      "id": "customer.renewal.outreach",
+      "retryable_steps": [
+        "customer.renewal.outreach.send"
+      ],
+      "steps": [
+        {
+          "action": "click",
+          "id": "customer.renewal.outreach.send",
+          "target": "customer.send_renewal_email",
+          "type": "element_action"
+        }
+      ],
+      "title": "Renewal Outreach"
+    },
+    {
+      "entry_points": [
+        "customer.renewal_note"
+      ],
+      "id": "customer.renewal.note",
+      "steps": [
+        {
+          "action": "submit",
+          "id": "customer.renewal.note.capture",
+          "target": "customer.renewal_note.save",
+          "type": "element_action"
+        }
+      ],
+      "title": "Renewal Note Capture"
+    }
+  ]
+}

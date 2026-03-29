@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "AIC Devtools",
+  "version": "0.2.0",
+  "description": "Inspect runtime AIC metadata in the current page.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AIC Devtools"
+  },
+  "background": {
+    "service_worker": "service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "content-script.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "devtools_page": "devtools.html",
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs"
+  ]
+}

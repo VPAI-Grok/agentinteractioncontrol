@@ -1,0 +1,25 @@
+{
+  "name": "@aic/plugin-vite",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "main": "./dist/plugin-vite/src/index.js",
+  "types": "./dist/plugin-vite/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/plugin-vite/src/index.d.ts",
+      "import": "./dist/plugin-vite/src/index.js",
+      "default": "./dist/plugin-vite/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@aic/automation-core": "workspace:*",
+    "@aic/runtime": "workspace:*",
+    "@aic/spec": "workspace:*",
+    "typescript": "^5.8.2"
+  }
+}

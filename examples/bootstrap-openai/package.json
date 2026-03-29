@@ -1,0 +1,9 @@
+{
+  "name": "@aic/example-bootstrap-openai",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "bootstrap": "node scripts/run-openai-bootstrap.mjs"
+  }
+}

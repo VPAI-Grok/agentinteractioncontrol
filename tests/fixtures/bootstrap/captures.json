@@ -1,0 +1,29 @@
+[
+  {
+    "route": "/",
+    "url": "https://demo.example",
+    "title": "Customers",
+    "visible_labels": [
+      "Archive customer",
+      "Send renewal email",
+      "Search customers"
+    ],
+    "accessibility": {
+      "role": "WebArea",
+      "children": [
+        {
+          "role": "button",
+          "name": "Archive customer"
+        },
+        {
+          "role": "button",
+          "name": "Send renewal email"
+        },
+        {
+          "role": "searchbox",
+          "name": "Search customers"
+        }
+      ]
+    }
+  }
+]

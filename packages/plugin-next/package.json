@@ -1,0 +1,25 @@
+{
+  "name": "@aic/plugin-next",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "main": "./dist/plugin-next/src/index.js",
+  "types": "./dist/plugin-next/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/plugin-next/src/index.d.ts",
+      "import": "./dist/plugin-next/src/index.js",
+      "default": "./dist/plugin-next/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@aic/automation-core": "workspace:*",
+    "@aic/runtime": "workspace:*",
+    "@aic/spec": "workspace:*",
+    "typescript": "^5.8.2"
+  }
+}

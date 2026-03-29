@@ -1,0 +1,1190 @@
+import assert from "node:assert/strict";
+import { createServer } from "node:http";
+import { readFile } from "node:fs/promises";
+import { rm } from "node:fs/promises";
+import test from "node:test";
+
+import {
+  readDirectoryFileMap,
+  readExpectedGoldenProjectFixture
+} from "./golden-artifacts.mjs";
+import {
+  createTempDir,
+  importWorkspaceModule,
+  readJsonFile,
+  resolveFromRepo,
+  runCli,
+  writeTextFile,
+  writeJsonFile
+} from "./helpers.mjs";
+
+const automationCore = await importWorkspaceModule(
+  "packages/automation-core/dist/automation-core/src/index.js"
+);
+const spec = await importWorkspaceModule("packages/spec/dist/index.js");
+const fixtureRoot = resolveFromRepo("tests/fixtures/plugin-app");
+const capturesFile = resolveFromRepo("tests/fixtures/bootstrap/captures.json");
+const diffFixtureRoot = resolveFromRepo("tests/fixtures/diffs");
+const projectNextConfig = resolveFromRepo("tests/fixtures/plugin-app/project.next.json");
+const projectViteConfig = resolveFromRepo("tests/fixtures/plugin-app/project.vite.json");
+const projectReportFixture = await readJsonFile(
+  resolveFromRepo("tests/fixtures/plugin-app/expected/vite/report.json")
+);
+const suggestionsFile = resolveFromRepo("tests/fixtures/bootstrap/suggestions.json");
+const expectedActionsDetailed = await readJsonFile(
+  resolveFromRepo("tests/fixtures/diffs/expected/actions-detailed.json")
+);
+const expectedActionsSummary = await readJsonFile(
+  resolveFromRepo("tests/fixtures/diffs/expected/actions-summary.json")
+);
+const expectedDiscoveryDetailed = await readJsonFile(
+  resolveFromRepo("tests/fixtures/diffs/expected/discovery-detailed.json")
+);
+const expectedPermissionsDetailed = await readJsonFile(
+  resolveFromRepo("tests/fixtures/diffs/expected/permissions-detailed.json")
+);
+const expectedUiSummary = await readJsonFile(
+  resolveFromRepo("tests/fixtures/diffs/expected/ui-summary.json")
+);
+const expectedWorkflowSummary = await readJsonFile(
+  resolveFromRepo("tests/fixtures/diffs/expected/workflows-summary.json")
+);
+
+async function startJsonServer(handler) {
+  const server = createServer(handler);
+  await new Promise((resolve) => {
+    server.listen(0, "127.0.0.1", resolve);
+  });
+
+  const address = server.address();
+  if (!address || typeof address === "string") {
+    throw new Error("Expected TCP server address.");
+  }
+
+  return {
+    close: () =>
+      new Promise((resolve, reject) => {
+        server.close((error) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+
+          resolve(undefined);
+        });
+      }),
+    url: `http://127.0.0.1:${address.port}`
+  };
+}
+
+test("CLI scan reports annotated elements from source files", async () => {
+  const result = await runCli(["scan", fixtureRoot]);
+
+  assert.equal(result.code, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.summary.filesScanned, 1);
+  assert.equal(payload.summary.extractedElements, 3);
+  assert.equal(payload.summary.sourceInventoryEntries, 8);
+  assert.equal(payload.summary.warnings, 4);
+  assert.deepEqual(
+    payload.matches.map((match) => match.agentId),
+    ["customer.archive", "customer.archive.dialog", "customer.view"]
+  );
+  assert.equal(payload.source_inventory.length, 8);
+  assert.deepEqual(
+    payload.diagnostics.map((diagnostic) => diagnostic.code),
+    [
+      "unsupported_import_reference",
+      "unsupported_member_expression",
+      "unsupported_call_expression",
+      "unsupported_expression"
+    ]
+  );
+  assert.ok(payload.diagnostics.every((diagnostic) => diagnostic.file === "src/App.tsx"));
+});
+
+test("CLI validate surfaces manifest errors for invalid runtime UI", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  const invalidUiFile = `${tempDir}/invalid-ui.json`;
+  await writeJsonFile(invalidUiFile, {
+    spec: "aic/0.1",
+    updated_at: "2026-03-28T00:00:00.000Z",
+    page: {
+      url: "https://demo.example"
+    },
+    view: {
+      view_id: "customers.list"
+    },
+    elements: [
+      {
+        id: "customer.archive",
+        label: "Archive customer",
+        role: "button",
+        actions: [
+          {
+            name: "click"
+          }
+        ],
+        risk: "critical",
+        state: {
+          visible: true
+        }
+      }
+    ]
+  });
+
+  const result = await runCli(["validate", "ui", invalidUiFile]);
+
+  assert.equal(result.code, 1);
+  assert.match(result.stderr, /Critical actions require structured confirmation details/);
+});
+
+test("CLI generate and diff commands produce stable machine-readable output", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  const discoveryConfig = `${tempDir}/discovery.json`;
+  const operateConfig = `${tempDir}/operate.json`;
+
+  await writeJsonFile(discoveryConfig, {
+    appName: "Demo App",
+    framework: "vite",
+    notes: ["fixture config"]
+  });
+  await writeJsonFile(operateConfig, {
+    appName: "Demo App"
+  });
+
+  const discoveryResult = await runCli(["generate", "discovery", discoveryConfig]);
+  const operateResult = await runCli(["generate", "operate", operateConfig]);
+  const diffResult = await runCli([
+    "diff",
+    "ui",
+    `${diffFixtureRoot}/ui-before.json`,
+    `${diffFixtureRoot}/ui-after.json`
+  ]);
+  const actionDiffResult = await runCli([
+    "diff",
+    "actions",
+    `${diffFixtureRoot}/actions-before.json`,
+    `${diffFixtureRoot}/actions-after.json`
+  ]);
+  const actionDetailedResult = await runCli([
+    "diff",
+    "actions",
+    `${diffFixtureRoot}/actions-before.json`,
+    `${diffFixtureRoot}/actions-after.json`,
+    "--format",
+    "detailed"
+  ]);
+  const discoveryDetailedResult = await runCli([
+    "diff",
+    "discovery",
+    `${diffFixtureRoot}/discovery-before.json`,
+    `${diffFixtureRoot}/discovery-after.json`,
+    "--format",
+    "detailed"
+  ]);
+  const permissionsDetailedResult = await runCli([
+    "diff",
+    "permissions",
+    `${diffFixtureRoot}/permissions-before.json`,
+    `${diffFixtureRoot}/permissions-after.json`,
+    "--format",
+    "detailed"
+  ]);
+  const workflowDiffResult = await runCli([
+    "diff",
+    "workflows",
+    `${diffFixtureRoot}/workflows-before.json`,
+    `${diffFixtureRoot}/workflows-after.json`
+  ]);
+
+  assert.equal(discoveryResult.code, 0);
+  assert.equal(operateResult.code, 0);
+  assert.equal(diffResult.code, 0);
+  assert.equal(actionDiffResult.code, 0);
+  assert.equal(actionDetailedResult.code, 0);
+  assert.equal(discoveryDetailedResult.code, 0);
+  assert.equal(permissionsDetailedResult.code, 0);
+  assert.equal(workflowDiffResult.code, 0);
+
+  const discovery = JSON.parse(discoveryResult.stdout);
+  assert.equal(discovery.app.name, "Demo App");
+  assert.equal(discovery.framework, "vite");
+  assert.match(operateResult.stdout, /AIC is enabled for Demo App\./);
+  assert.deepEqual(JSON.parse(diffResult.stdout), expectedUiSummary);
+  assert.deepEqual(JSON.parse(actionDiffResult.stdout), expectedActionsSummary);
+  assert.deepEqual(JSON.parse(actionDetailedResult.stdout), expectedActionsDetailed);
+  assert.deepEqual(JSON.parse(discoveryDetailedResult.stdout), expectedDiscoveryDetailed);
+  assert.deepEqual(JSON.parse(permissionsDetailedResult.stdout), expectedPermissionsDetailed);
+  assert.deepEqual(JSON.parse(workflowDiffResult.stdout), expectedWorkflowSummary);
+});
+
+test("CLI generate project emits the full artifact set and writes generated files", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  const viteOutDir = `${tempDir}/vite`;
+  const nextOutDir = `${tempDir}/next`;
+  const viteResult = await runCli([
+    "generate",
+    "project",
+    projectViteConfig,
+    "--out-dir",
+    viteOutDir
+  ]);
+  const nextResult = await runCli([
+    "generate",
+    "project",
+    projectNextConfig,
+    "--out-dir",
+    nextOutDir
+  ]);
+
+  assert.equal(viteResult.code, 0);
+  assert.equal(nextResult.code, 0);
+
+  const vitePayload = JSON.parse(viteResult.stdout);
+  const nextPayload = JSON.parse(nextResult.stdout);
+  const expectedVite = await readExpectedGoldenProjectFixture("vite");
+  const expectedNext = await readExpectedGoldenProjectFixture("next");
+  const viteFiles = await readDirectoryFileMap(viteOutDir);
+  const nextFiles = await readDirectoryFileMap(nextOutDir);
+
+  assert.equal(nextPayload.framework, "nextjs");
+  assert.equal(nextPayload.diagnostics.length, 4);
+  assert.equal(vitePayload.source_inventory.length, 8);
+  assert.ok(vitePayload.outDir.endsWith(viteOutDir));
+  assert.ok(nextPayload.outDir.endsWith(nextOutDir));
+  assert.deepEqual(viteFiles, expectedVite.files);
+  assert.deepEqual(nextFiles, expectedNext.files);
+});
+
+test("CLI bootstrap writes prompt, draft, review, and report artifacts from offline fixtures", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  const promptFile = `${tempDir}/prompt.json`;
+  const draftFile = `${tempDir}/draft.json`;
+  const reviewFile = `${tempDir}/review.json`;
+  const reportFile = `${tempDir}/report.txt`;
+
+  const result = await runCli([
+    "bootstrap",
+    "https://demo.example",
+    "--app-name",
+    "Demo Bootstrap",
+    "--captures-file",
+    capturesFile,
+    "--suggestions-file",
+    suggestionsFile,
+    "--prompt-file",
+    promptFile,
+    "--draft-file",
+    draftFile,
+    "--review-file",
+    reviewFile,
+    "--report-file",
+    reportFile
+  ]);
+
+  assert.equal(result.code, 0);
+  assert.match(result.stdout, /Bootstrap review for Demo Bootstrap/);
+
+  const prompt = await readJsonFile(promptFile);
+  const draft = await readJsonFile(draftFile);
+  const review = await readJsonFile(reviewFile);
+  const report = await readFile(reportFile, "utf8");
+
+  assert.equal(prompt.input.app.name, "Demo Bootstrap");
+  assert.equal(draft.provider_name, "file-model");
+  assert.equal(draft.suggestions[0].target, "customer.archive");
+  assert.equal(review.artifact_type, "aic_bootstrap_review");
+  assert.equal(review.summary.accepted_suggestions, 2);
+  assert.equal(review.summary.filtered_suggestions, 0);
+  assert.match(report, /Suggestion provider: file-model/);
+  assert.match(report, /Accepted suggestions: 2/);
+
+  const inspectResult = await runCli(["inspect", reviewFile]);
+
+  assert.equal(inspectResult.code, 0);
+  assert.match(inspectResult.stdout, /Bootstrap review for Demo Bootstrap/);
+  assert.match(inspectResult.stdout, /Suggestions: 2 accepted, 0 filtered/);
+
+  const promptOnlyResult = await runCli([
+    "bootstrap",
+    "https://demo.example",
+    "--app-name",
+    "Demo Bootstrap",
+    "--captures-file",
+    capturesFile,
+    "--print-prompt"
+  ]);
+
+  assert.equal(promptOnlyResult.code, 0);
+  assert.equal(JSON.parse(promptOnlyResult.stdout).input.app.name, "Demo Bootstrap");
+});
+
+test("CLI bootstrap applies max-suggestion filtering deterministically", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  const reviewFile = `${tempDir}/review.json`;
+  const result = await runCli([
+    "bootstrap",
+    "https://demo.example",
+    "--app-name",
+    "Demo Bootstrap",
+    "--captures-file",
+    capturesFile,
+    "--suggestions-file",
+    suggestionsFile,
+    "--review-file",
+    reviewFile,
+    "--min-confidence",
+    "0.5",
+    "--max-suggestions",
+    "1"
+  ]);
+
+  assert.equal(result.code, 0);
+
+  const review = await readJsonFile(reviewFile);
+
+  assert.equal(review.summary.accepted_suggestions, 1);
+  assert.equal(review.summary.filtered_suggestions, 1);
+  assert.equal(review.draft.suggestions[0].target, "customer.archive");
+  assert.equal(review.suggestions[1].status, "filtered_out");
+  assert.equal(review.suggestions[1].issues[0].code, "exceeds_max_suggestions");
+});
+
+test("CLI bootstrap validates provider timeout and retry flags", async () => {
+  const invalidTimeout = await runCli([
+    "bootstrap",
+    "https://demo.example",
+    "--captures-file",
+    capturesFile,
+    "--provider-timeout-ms",
+    "0",
+    "--print-prompt"
+  ]);
+  assert.equal(invalidTimeout.code, 1);
+  assert.match(invalidTimeout.stderr, /--provider-timeout-ms must be a positive integer/);
+
+  const invalidRetries = await runCli([
+    "bootstrap",
+    "https://demo.example",
+    "--captures-file",
+    capturesFile,
+    "--provider-retries",
+    "-1",
+    "--print-prompt"
+  ]);
+  assert.equal(invalidRetries.code, 1);
+  assert.match(invalidRetries.stderr, /--provider-retries must be a non-negative integer/);
+});
+
+test("CLI bootstrap surfaces normalized provider failures with retry context", async (t) => {
+  let requestCount = 0;
+  const server = await startJsonServer((_request, response) => {
+    requestCount += 1;
+    response.writeHead(503, {
+      "content-type": "application/json"
+    });
+    response.end(JSON.stringify({ error: "upstream unavailable" }));
+  });
+
+  t.after(async () => {
+    await server.close();
+  });
+
+  const result = await runCli([
+    "bootstrap",
+    "https://demo.example",
+    "--app-name",
+    "Demo Bootstrap",
+    "--captures-file",
+    capturesFile,
+    "--provider-endpoint",
+    `${server.url}/suggest`,
+    "--provider-model",
+    "fixture-model",
+    "--provider-retries",
+    "1",
+    "--provider-timeout-ms",
+    "250"
+  ]);
+
+  assert.equal(result.code, 1);
+  assert.equal(requestCount, 2);
+  assert.match(result.stderr, /Bootstrap capture failed after planning routes: \//);
+  assert.match(result.stderr, new RegExp(`Provider: http:${server.url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\/suggest`));
+  assert.match(result.stderr, /Failure kind: server \(status 503\)/);
+  assert.match(result.stderr, /Retryable: yes after 2 attempt\(s\)/);
+  assert.match(result.stderr, /Provider request failed with status 503/);
+});
+
+test("CLI generate authoring-plan emits a shared patch-plan artifact and inspect summarizes it", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  const snapshotFile = `${tempDir}/snapshot.json`;
+  const domCandidatesFile = `${tempDir}/dom-candidates.json`;
+  const bootstrapReviewFile = `${tempDir}/bootstrap-review.json`;
+
+  await writeJsonFile(snapshotFile, {
+    spec: "aic/0.1",
+    updated_at: "2026-03-28T00:00:00.000Z",
+    page: {
+      url: "https://demo.example/customers"
+    },
+    view: {
+      route_pattern: "/customers",
+      view_id: "customers.list"
+    },
+    elements: [
+      {
+        id: "customer.archive",
+        label: "Archive customer",
+        role: "button",
+        actions: [
+          {
+            name: "click",
+            target: "customer.archive",
+            type: "element_action"
+          }
+        ],
+        risk: "high",
+        state: {
+          visible: true
+        }
+      }
+    ]
+  });
+  await writeJsonFile(domCandidatesFile, [
+    {
+      key: "/customers::button::send_renewal_email",
+      label: "Send renewal email",
+      page_url: "https://demo.example/customers",
+      role: "button",
+      route_pattern: "/customers",
+      selectors: {
+        text: "Send renewal email"
+      },
+      tag_name: "button"
+    }
+  ]);
+  await writeJsonFile(bootstrapReviewFile, {
+    artifact_type: "aic_bootstrap_review",
+    suggestions: [
+      {
+        status: "accepted",
+        suggestion: {
+          action: "click",
+          confidence_score: 0.88,
+          label: "Send renewal email",
+          review_required: false,
+          risk: "medium",
+          role: "button",
+          route: "/customers",
+          target: "customer.send_renewal_email"
+        }
+      }
+    ]
+  });
+
+  const result = await runCli([
+    "generate",
+    "authoring-plan",
+    snapshotFile,
+    "--dom-candidates",
+    domCandidatesFile,
+    "--report",
+    resolveFromRepo("tests/fixtures/plugin-app/expected/vite/report.json"),
+    "--bootstrap-review",
+    bootstrapReviewFile
+  ]);
+
+  assert.equal(result.code, 0);
+
+  const plan = JSON.parse(result.stdout);
+
+  assert.equal(plan.artifact_type, "aic_authoring_patch_plan");
+  assert.equal(plan.summary.total_proposals, 2);
+  assert.equal(plan.summary.ready, 2);
+  assert.equal(plan.summary.apply_ready, 2);
+  assert.equal(plan.summary.needs_source_match, 0);
+
+  const inspectFile = `${tempDir}/authoring-plan.json`;
+  await writeJsonFile(inspectFile, plan);
+
+  const inspectResult = await runCli(["inspect", inspectFile]);
+
+  assert.equal(inspectResult.code, 0);
+  assert.match(inspectResult.stdout, /AIC authoring patch plan/);
+  assert.match(inspectResult.stdout, /Proposals: 2/);
+  assert.match(inspectResult.stdout, /Apply ready: 2/);
+  assert.match(inspectResult.stdout, /Needs source match: 0/);
+});
+
+test("CLI apply authoring-plan supports dry-run and write modes with guarded exact source edits", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  const sourceFile = `${tempDir}/src/App.tsx`;
+  await writeTextFile(
+    sourceFile,
+    `export function App() {
+  return (
+    <main>
+      <button
+        agentId="customer.archive"
+        agentDescription="Archive customer"
+        agentAction="click"
+        agentRisk="high"
+      >
+        Archive customer
+      </button>
+      <button data-testid="send-renewal">Send renewal email</button>
+    </main>
+  );
+}
+`
+  );
+
+  const artifacts = await automationCore.generateProjectArtifacts({
+    appName: "Apply Fixture",
+    framework: "vite",
+    projectRoot: tempDir,
+    viewId: "customers.list",
+    viewUrl: "https://demo.example/customers"
+  });
+  const report = automationCore.createProjectArtifactReport("vite", artifacts);
+  const plan = spec.buildAICAuthoringPatchPlan({
+    bootstrap_review: {
+      artifact_type: "aic_bootstrap_review",
+      suggestions: [
+        {
+          status: "accepted",
+          suggestion: {
+            action: "click",
+            confidence_score: 0.95,
+            label: "Send renewal email",
+            review_required: false,
+            risk: "medium",
+            role: "button",
+            route: "/customers",
+            target: "customer.send_renewal_email"
+          }
+        }
+      ]
+    },
+    dom_candidates: [
+      {
+        key: "/customers::button::send_renewal_email",
+        label: "Send renewal email",
+        page_url: "https://demo.example/customers",
+        role: "button",
+        route_pattern: "/customers",
+        selectors: {
+          testId: "send-renewal",
+          text: "Send renewal email"
+        },
+        tag_name: "button"
+      }
+    ],
+    project_report: report,
+    snapshot: {
+      spec: "aic/0.1",
+      updated_at: "2026-03-28T00:00:00.000Z",
+      page: {
+        url: "https://demo.example/customers"
+      },
+      view: {
+        route_pattern: "/customers",
+        view_id: "customers.list"
+      },
+      elements: [
+        {
+          id: "customer.archive",
+          label: "Archive customer",
+          description: "Archive selected customer",
+          role: "menuitem",
+          actions: [
+            {
+              name: "click",
+              target: "customer.archive",
+              type: "element_action"
+            }
+          ],
+          confirmation: {
+            type: "human_review"
+          },
+          entity_ref: {
+            entity_id: "cust_123",
+            entity_label: "Acme Co",
+            entity_type: "customer"
+          },
+          requires_confirmation: true,
+          risk: "critical",
+          state: {
+            visible: true
+          },
+          workflow_ref: "customer.archive"
+        }
+      ]
+    }
+  });
+
+  const archiveProposal = plan.proposals.find((proposal) => proposal.key === "existing:customer.archive");
+  assert.ok(archiveProposal);
+  assert.deepEqual(archiveProposal.recommended_optional_props, {
+    agentEntityId: "cust_123",
+    agentEntityLabel: "Acme Co",
+    agentEntityType: "customer",
+    agentRequiresConfirmation: true,
+    agentRole: "menuitem",
+    agentWorkflowStep: "customer.archive"
+  });
+  assert.equal(plan.summary.review_only_metadata, 1);
+
+  const planFile = `${tempDir}/authoring-plan.json`;
+  const dryRunReportFile = `${tempDir}/apply-dry-run.json`;
+  await writeJsonFile(planFile, plan);
+
+  const dryRunResult = await runCli([
+    "apply",
+    "authoring-plan",
+    planFile,
+    "--project-root",
+    tempDir,
+    "--report-file",
+    dryRunReportFile
+  ]);
+
+  assert.equal(dryRunResult.code, 0);
+  const dryRunPayload = JSON.parse(dryRunResult.stdout);
+  assert.equal(dryRunPayload.artifact_type, "aic_authoring_apply_result");
+  assert.equal(dryRunPayload.dry_run, true);
+  assert.equal(dryRunPayload.summary.applied, 2);
+  assert.equal(dryRunPayload.summary.changed_files, 1);
+  assert.equal((await readJsonFile(dryRunReportFile)).summary.applied, 2);
+
+  const sourceAfterDryRun = await readFile(sourceFile, "utf8");
+  assert.match(sourceAfterDryRun, /agentDescription="Archive customer"/);
+  assert.doesNotMatch(sourceAfterDryRun, /customer\.send_renewal_email/);
+
+  const writeResult = await runCli([
+    "apply",
+    "authoring-plan",
+    planFile,
+    "--project-root",
+    tempDir,
+    "--write"
+  ]);
+
+  assert.equal(writeResult.code, 0);
+  const writePayload = JSON.parse(writeResult.stdout);
+  assert.equal(writePayload.dry_run, false);
+  assert.equal(writePayload.summary.applied, 2);
+
+  const updatedSource = await readFile(sourceFile, "utf8");
+  assert.match(updatedSource, /agentDescription="Archive selected customer"/);
+  assert.match(updatedSource, /agentRisk="critical"/);
+  assert.match(updatedSource, /agentRole="menuitem"/);
+  assert.match(updatedSource, /agentRequiresConfirmation/);
+  assert.match(updatedSource, /agentEntityId="cust_123"/);
+  assert.match(updatedSource, /agentEntityType="customer"/);
+  assert.match(updatedSource, /agentEntityLabel="Acme Co"/);
+  assert.match(updatedSource, /agentWorkflowStep="customer\.archive"/);
+  assert.match(updatedSource, /agentId="customer\.send_renewal_email"/);
+  assert.match(updatedSource, /agentAction="click"/);
+
+  const inspectResult = await runCli(["inspect", dryRunReportFile]);
+  assert.equal(inspectResult.code, 0);
+  assert.match(inspectResult.stdout, /AIC authoring apply result/);
+  assert.match(inspectResult.stdout, /Applied: 2/);
+});
+
+test("CLI apply authoring-plan recovers drifted line numbers by opening tag signature", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  const sourceFile = `${tempDir}/src/App.tsx`;
+  await writeTextFile(
+    sourceFile,
+    `export function App() {
+  return <button data-testid="send-renewal">Send renewal email</button>;
+}
+`
+  );
+
+  const artifacts = await automationCore.generateProjectArtifacts({
+    appName: "Signature Recovery Fixture",
+    framework: "vite",
+    projectRoot: tempDir,
+    viewId: "customers.list",
+    viewUrl: "https://demo.example/customers"
+  });
+  const report = automationCore.createProjectArtifactReport("vite", artifacts);
+  const plan = spec.buildAICAuthoringPatchPlan({
+    bootstrap_review: {
+      artifact_type: "aic_bootstrap_review",
+      suggestions: [
+        {
+          status: "accepted",
+          suggestion: {
+            action: "click",
+            confidence_score: 0.95,
+            label: "Send renewal email",
+            review_required: false,
+            risk: "medium",
+            role: "button",
+            route: "/customers",
+            target: "customer.send_renewal_email"
+          }
+        }
+      ]
+    },
+    dom_candidates: [
+      {
+        key: "/customers::button::send_renewal_email",
+        label: "Send renewal email",
+        page_url: "https://demo.example/customers",
+        role: "button",
+        route_pattern: "/customers",
+        selectors: {
+          testId: "send-renewal",
+          text: "Send renewal email"
+        },
+        tag_name: "button"
+      }
+    ],
+    project_report: report,
+    snapshot: {
+      spec: "aic/0.1",
+      updated_at: "2026-03-28T00:00:00.000Z",
+      page: {
+        url: "https://demo.example/customers"
+      },
+      view: {
+        route_pattern: "/customers",
+        view_id: "customers.list"
+      },
+      elements: []
+    }
+  });
+
+  const proposal = plan.proposals.find((entry) => entry.key === "dom:/customers::button::send_renewal_email");
+  assert.ok(proposal?.apply_target?.opening_tag_signature);
+
+  const planFile = `${tempDir}/authoring-plan.json`;
+  await writeJsonFile(planFile, plan);
+  await writeTextFile(
+    sourceFile,
+    `\nexport function App() {
+  return <button data-testid="send-renewal">Send renewal email</button>;
+}
+`
+  );
+
+  const result = await runCli([
+    "apply",
+    "authoring-plan",
+    planFile,
+    "--project-root",
+    tempDir,
+    "--write"
+  ]);
+
+  assert.equal(result.code, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.summary.applied, 1);
+  assert.match(payload.outcomes[0].message, /Recovered source by opening tag signature/);
+
+  const updatedSource = await readFile(sourceFile, "utf8");
+  assert.match(updatedSource, /agentId="customer\.send_renewal_email"/);
+});
+
+test("CLI apply authoring-plan blocks spread-attribute targets", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  const sourceFile = `${tempDir}/src/App.tsx`;
+  await writeTextFile(
+    sourceFile,
+    `export function App(props) {
+  return <button {...props} data-testid="send-renewal">Send renewal email</button>;
+}
+`
+  );
+
+  const artifacts = await automationCore.generateProjectArtifacts({
+    appName: "Spread Block Fixture",
+    framework: "vite",
+    projectRoot: tempDir,
+    viewId: "customers.list",
+    viewUrl: "https://demo.example/customers"
+  });
+  const report = automationCore.createProjectArtifactReport("vite", artifacts);
+  const plan = spec.buildAICAuthoringPatchPlan({
+    bootstrap_review: {
+      artifact_type: "aic_bootstrap_review",
+      suggestions: [
+        {
+          status: "accepted",
+          suggestion: {
+            action: "click",
+            confidence_score: 0.95,
+            label: "Send renewal email",
+            review_required: false,
+            risk: "medium",
+            role: "button",
+            route: "/customers",
+            target: "customer.send_renewal_email"
+          }
+        }
+      ]
+    },
+    dom_candidates: [
+      {
+        key: "/customers::button::send_renewal_email",
+        label: "Send renewal email",
+        page_url: "https://demo.example/customers",
+        role: "button",
+        route_pattern: "/customers",
+        selectors: {
+          testId: "send-renewal",
+          text: "Send renewal email"
+        },
+        tag_name: "button"
+      }
+    ],
+    project_report: report,
+    snapshot: {
+      spec: "aic/0.1",
+      updated_at: "2026-03-28T00:00:00.000Z",
+      page: {
+        url: "https://demo.example/customers"
+      },
+      view: {
+        route_pattern: "/customers",
+        view_id: "customers.list"
+      },
+      elements: []
+    }
+  });
+
+  const proposal = plan.proposals.find((entry) => entry.key === "dom:/customers::button::send_renewal_email");
+  assert.equal(proposal?.apply_status, "blocked");
+  assert.equal(proposal?.apply_block_reason, "spread_attributes_present");
+  assert.ok(proposal?.apply_target);
+
+  const planFile = `${tempDir}/authoring-plan.json`;
+  await writeJsonFile(planFile, plan);
+  const result = await runCli([
+    "apply",
+    "authoring-plan",
+    planFile,
+    "--project-root",
+    tempDir
+  ]);
+
+  assert.equal(result.code, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.summary.applied, 0);
+  assert.equal(payload.summary.skipped, 1);
+  assert.match(payload.outcomes[0].message, /JSX spread attributes/);
+});
+
+test("CLI apply authoring-plan blocks duplicate AIC props on exact matches", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  const sourceFile = `${tempDir}/src/App.tsx`;
+  await writeTextFile(
+    sourceFile,
+    `export function App() {
+  return (
+    <button
+      agentId="customer.archive"
+      agentDescription="Archive customer"
+      agentDescription="Archive legacy customer"
+      agentAction="click"
+      agentRisk="high"
+    >
+      Archive customer
+    </button>
+  );
+}
+`
+  );
+
+  const artifacts = await automationCore.generateProjectArtifacts({
+    appName: "Duplicate Prop Fixture",
+    framework: "vite",
+    projectRoot: tempDir,
+    viewId: "customers.list",
+    viewUrl: "https://demo.example/customers"
+  });
+  const report = automationCore.createProjectArtifactReport("vite", artifacts);
+  const plan = spec.buildAICAuthoringPatchPlan({
+    project_report: report,
+    snapshot: {
+      spec: "aic/0.1",
+      updated_at: "2026-03-28T00:00:00.000Z",
+      page: {
+        url: "https://demo.example/customers"
+      },
+      view: {
+        route_pattern: "/customers",
+        view_id: "customers.list"
+      },
+      elements: [
+        {
+          id: "customer.archive",
+          label: "Archive customer",
+          description: "Archive selected customer",
+          role: "button",
+          actions: [
+            {
+              name: "click",
+              target: "customer.archive",
+              type: "element_action"
+            }
+          ],
+          risk: "critical",
+          state: {
+            visible: true
+          }
+        }
+      ]
+    }
+  });
+
+  const proposal = plan.proposals.find((entry) => entry.key === "existing:customer.archive");
+  assert.equal(proposal?.apply_status, "blocked");
+  assert.equal(proposal?.apply_block_reason, "duplicate_aic_props");
+
+  const planFile = `${tempDir}/authoring-plan.json`;
+  await writeJsonFile(planFile, plan);
+  const result = await runCli([
+    "apply",
+    "authoring-plan",
+    planFile,
+    "--project-root",
+    tempDir
+  ]);
+
+  assert.equal(result.code, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.summary.applied, 0);
+  assert.equal(payload.summary.skipped, 1);
+  assert.match(payload.outcomes[0].message, /duplicate AIC props/);
+});
+
+test("CLI apply authoring-plan blocks dynamic existing AIC props on exact matches", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  const sourceFile = `${tempDir}/src/App.tsx`;
+  await writeTextFile(
+    sourceFile,
+    `export function App(customer) {
+  return (
+    <button
+      agentId="customer.archive"
+      agentDescription={customer.name}
+      agentAction="click"
+      agentRisk="high"
+    >
+      Archive customer
+    </button>
+  );
+}
+`
+  );
+
+  const artifacts = await automationCore.generateProjectArtifacts({
+    appName: "Dynamic Prop Fixture",
+    framework: "vite",
+    projectRoot: tempDir,
+    viewId: "customers.list",
+    viewUrl: "https://demo.example/customers"
+  });
+  const report = automationCore.createProjectArtifactReport("vite", artifacts);
+  const plan = spec.buildAICAuthoringPatchPlan({
+    project_report: report,
+    snapshot: {
+      spec: "aic/0.1",
+      updated_at: "2026-03-28T00:00:00.000Z",
+      page: {
+        url: "https://demo.example/customers"
+      },
+      view: {
+        route_pattern: "/customers",
+        view_id: "customers.list"
+      },
+      elements: [
+        {
+          id: "customer.archive",
+          label: "Archive customer",
+          description: "Archive selected customer",
+          role: "button",
+          actions: [
+            {
+              name: "click",
+              target: "customer.archive",
+              type: "element_action"
+            }
+          ],
+          risk: "critical",
+          state: {
+            visible: true
+          }
+        }
+      ]
+    }
+  });
+
+  const proposal = plan.proposals.find((entry) => entry.key === "existing:customer.archive");
+  assert.equal(proposal?.apply_status, "blocked");
+  assert.equal(proposal?.apply_block_reason, "dynamic_existing_aic_prop");
+
+  const planFile = `${tempDir}/authoring-plan.json`;
+  await writeJsonFile(planFile, plan);
+  const result = await runCli([
+    "apply",
+    "authoring-plan",
+    planFile,
+    "--project-root",
+    tempDir
+  ]);
+
+  assert.equal(result.code, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.summary.applied, 0);
+  assert.equal(payload.summary.skipped, 1);
+  assert.match(payload.outcomes[0].message, /unsupported dynamic expressions/);
+});
+
+test("CLI apply authoring-plan skips proposals whose recorded source target drifted", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  const sourceFile = `${tempDir}/src/App.tsx`;
+  await writeTextFile(
+    sourceFile,
+    `export function App() {
+  return <button data-testid="send-renewal">Send renewal email</button>;
+}
+`
+  );
+
+  const artifacts = await automationCore.generateProjectArtifacts({
+    appName: "Drift Fixture",
+    framework: "vite",
+    projectRoot: tempDir,
+    viewId: "customers.list",
+    viewUrl: "https://demo.example/customers"
+  });
+  const report = automationCore.createProjectArtifactReport("vite", artifacts);
+  const plan = spec.buildAICAuthoringPatchPlan({
+    bootstrap_review: {
+      artifact_type: "aic_bootstrap_review",
+      suggestions: [
+        {
+          status: "accepted",
+          suggestion: {
+            action: "click",
+            confidence_score: 0.95,
+            label: "Send renewal email",
+            review_required: false,
+            risk: "medium",
+            role: "button",
+            route: "/customers",
+            target: "customer.send_renewal_email"
+          }
+        }
+      ]
+    },
+    dom_candidates: [
+      {
+        key: "/customers::button::send_renewal_email",
+        label: "Send renewal email",
+        page_url: "https://demo.example/customers",
+        role: "button",
+        route_pattern: "/customers",
+        selectors: {
+          testId: "send-renewal",
+          text: "Send renewal email"
+        },
+        tag_name: "button"
+      }
+    ],
+    project_report: report,
+    snapshot: {
+      spec: "aic/0.1",
+      updated_at: "2026-03-28T00:00:00.000Z",
+      page: {
+        url: "https://demo.example/customers"
+      },
+      view: {
+        route_pattern: "/customers",
+        view_id: "customers.list"
+      },
+      elements: []
+    }
+  });
+
+  const planFile = `${tempDir}/authoring-plan.json`;
+  await writeJsonFile(planFile, plan);
+  await writeTextFile(
+    sourceFile,
+    `\nexport function App() {
+  return <button className="primary" data-testid="send-renewal">Send renewal email</button>;
+}
+`
+  );
+
+  const result = await runCli([
+    "apply",
+    "authoring-plan",
+    planFile,
+    "--project-root",
+    tempDir
+  ]);
+
+  assert.equal(result.code, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.summary.applied, 0);
+  assert.equal(payload.summary.skipped, 1);
+  assert.match(payload.outcomes[0].message, /Recorded source target no longer matches/);
+});

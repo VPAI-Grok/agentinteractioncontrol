@@ -1,0 +1,26 @@
+[
+  {
+    "target": "customer.archive",
+    "label": "Archive customer",
+    "route": "/",
+    "role": "button",
+    "action": "click",
+    "risk": "high",
+    "source": "accessibility",
+    "confidence_score": 0.91,
+    "review_required": true,
+    "patch_summary": "Annotate the archive button"
+  },
+  {
+    "target": "customer.send_renewal_email",
+    "label": "Send renewal email",
+    "route": "/",
+    "role": "button",
+    "action": "click",
+    "risk": "medium",
+    "source": "accessibility",
+    "confidence_score": 0.87,
+    "review_required": false,
+    "patch_summary": "Annotate the send email button"
+  }
+]

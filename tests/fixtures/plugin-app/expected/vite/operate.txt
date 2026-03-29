@@ -1,0 +1,10 @@
+AIC is enabled for Demo CRM.
+Source of truth manifests:
+- UI: /.well-known/agent/ui
+- Actions: /.well-known/agent/actions
+- Permissions: /.well-known/agent-permissions.json
+- Workflows: /.well-known/agent-workflows.json
+
+Notes:
+- fixture project
+- HMR metadata refresh enabled.

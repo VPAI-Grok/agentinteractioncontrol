@@ -1,0 +1,27 @@
+{
+  "spec": "aic/0.1",
+  "manifest_version": "0.1.0",
+  "updated_at": "2026-03-28T00:00:00.000Z",
+  "page": {
+    "url": "https://demo.example"
+  },
+  "view": {
+    "view_id": "customers.list"
+  },
+  "elements": [
+    {
+      "id": "customer.view",
+      "label": "View customer",
+      "role": "link",
+      "actions": [
+        {
+          "name": "navigate"
+        }
+      ],
+      "risk": "low",
+      "state": {
+        "visible": true
+      }
+    }
+  ]
+}

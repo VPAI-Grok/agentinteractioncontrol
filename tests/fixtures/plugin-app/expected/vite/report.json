@@ -1,0 +1,202 @@
+{
+  "diagnostics": [
+    {
+      "attribute": "agentId",
+      "code": "unsupported_import_reference",
+      "column": 24,
+      "file": "src/App.tsx",
+      "line": 67,
+      "message": "agentId references imported symbol \"importedAgentId\", which is outside same-file deterministic extraction.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentId",
+      "code": "unsupported_member_expression",
+      "column": 3,
+      "file": "src/App.tsx",
+      "line": 24,
+      "message": "agentId uses an unsupported object literal key. Use identifier or string-literal keys only.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentId",
+      "code": "unsupported_call_expression",
+      "column": 24,
+      "file": "src/App.tsx",
+      "line": 73,
+      "message": "agentId uses helper \"withArgs\" with arguments. Use a same-file zero-arg helper with a single static return expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentId",
+      "code": "unsupported_expression",
+      "column": 19,
+      "file": "src/App.tsx",
+      "line": 27,
+      "message": "agentId uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    }
+  ],
+  "filesScanned": 1,
+  "framework": "vite",
+  "matches": [
+    {
+      "action": "click",
+      "agentDescription": "Archive customer",
+      "agentId": "customer.archive",
+      "column": 7,
+      "file": "src/App.tsx",
+      "line": 39,
+      "risk": "high",
+      "role": "dialog_trigger",
+      "source_key": "src/App.tsx:39:7:ShadcnAICDialogTrigger",
+      "tagName": "ShadcnAICDialogTrigger"
+    },
+    {
+      "action": "read",
+      "agentDescription": "Archive customer dialog",
+      "agentId": "customer.archive.dialog",
+      "column": 7,
+      "file": "src/App.tsx",
+      "line": 48,
+      "risk": "medium",
+      "role": "dialog",
+      "source_key": "src/App.tsx:48:7:ShadcnAICDialogContent",
+      "tagName": "ShadcnAICDialogContent"
+    },
+    {
+      "action": "select",
+      "agentDescription": "View customer",
+      "agentId": "customer.view",
+      "column": 7,
+      "file": "src/App.tsx",
+      "line": 57,
+      "risk": "low",
+      "role": "tab",
+      "source_key": "src/App.tsx:57:7:ShadcnAICTabsTrigger",
+      "tagName": "ShadcnAICTabsTrigger"
+    }
+  ],
+  "source_inventory": [
+    {
+      "annotated_agent_id": "customer.archive",
+      "column": 7,
+      "file": "src/App.tsx",
+      "label": "Archive customer",
+      "line": 39,
+      "opening_tag_signature": "<ShadcnAICDialogTrigger agentId={archiveId} agentDescription=\"Archive customer\" agentAction={agentTokens.archive.action} agentRisk={archiveRisk} agentRole=\"dialog_trigger\" >",
+      "role": "dialog_trigger",
+      "selectors": {
+        "text": "Archive customer"
+      },
+      "source_key": "src/App.tsx:39:7:ShadcnAICDialogTrigger",
+      "tagName": "ShadcnAICDialogTrigger"
+    },
+    {
+      "annotated_agent_id": "customer.archive.dialog",
+      "column": 7,
+      "file": "src/App.tsx",
+      "label": "Review archive impact",
+      "line": 48,
+      "opening_tag_signature": "<ShadcnAICDialogContent agentId=\"customer.archive.dialog\" agentDescription=\"Archive customer dialog\" agentAction=\"read\" agentRisk=\"medium\" agentRole=\"dialog\" >",
+      "role": "dialog",
+      "selectors": {
+        "text": "Review archive impact"
+      },
+      "source_key": "src/App.tsx:48:7:ShadcnAICDialogContent",
+      "tagName": "ShadcnAICDialogContent"
+    },
+    {
+      "annotated_agent_id": "customer.view",
+      "column": 7,
+      "file": "src/App.tsx",
+      "label": "View customer",
+      "line": 57,
+      "opening_tag_signature": "<ShadcnAICTabsTrigger agentId={getViewId()} agentDescription={getViewDescription()} agentAction=\"select\" agentRisk=\"low\" agentRole=\"tab\" >",
+      "role": "tab",
+      "selectors": {
+        "text": "View customer"
+      },
+      "source_key": "src/App.tsx:57:7:ShadcnAICTabsTrigger",
+      "tagName": "ShadcnAICTabsTrigger"
+    },
+    {
+      "column": 7,
+      "file": "src/App.tsx",
+      "label": "Send renewal email",
+      "line": 66,
+      "opening_tag_signature": "<button data-testid=\"send-renewal\">",
+      "role": "button",
+      "selectors": {
+        "testId": "send-renewal",
+        "text": "Send renewal email"
+      },
+      "source_key": "src/App.tsx:66:7:button",
+      "tagName": "button"
+    },
+    {
+      "column": 7,
+      "file": "src/App.tsx",
+      "label": "Skip imported",
+      "line": 67,
+      "opening_tag_signature": "<button agentId={importedAgentId} agentDescription=\"Imported unsupported control\">",
+      "role": "button",
+      "selectors": {
+        "text": "Skip imported"
+      },
+      "source_key": "src/App.tsx:67:7:button",
+      "tagName": "button",
+      "unsupported_aic_props": [
+        "agentId"
+      ]
+    },
+    {
+      "column": 7,
+      "file": "src/App.tsx",
+      "label": "Skip computed",
+      "line": 70,
+      "opening_tag_signature": "<button agentId={withComputedKey.badId} agentDescription=\"Computed key unsupported\">",
+      "role": "button",
+      "selectors": {
+        "text": "Skip computed"
+      },
+      "source_key": "src/App.tsx:70:7:button",
+      "tagName": "button",
+      "unsupported_aic_props": [
+        "agentId"
+      ]
+    },
+    {
+      "column": 7,
+      "file": "src/App.tsx",
+      "label": "Skip helper args",
+      "line": 73,
+      "opening_tag_signature": "<button agentId={withArgs(\"helper\")} agentDescription=\"Helper args unsupported\">",
+      "role": "button",
+      "selectors": {
+        "text": "Skip helper args"
+      },
+      "source_key": "src/App.tsx:73:7:button",
+      "tagName": "button",
+      "unsupported_aic_props": [
+        "agentId"
+      ]
+    },
+    {
+      "column": 7,
+      "file": "src/App.tsx",
+      "label": "Skip dynamic",
+      "line": 76,
+      "opening_tag_signature": "<button agentId={dynamicId} agentDescription=\"Skipped dynamic control\">",
+      "role": "button",
+      "selectors": {
+        "text": "Skip dynamic"
+      },
+      "source_key": "src/App.tsx:76:7:button",
+      "tagName": "button",
+      "unsupported_aic_props": [
+        "agentId"
+      ]
+    }
+  ]
+}

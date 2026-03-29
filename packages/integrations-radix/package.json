@@ -1,0 +1,23 @@
+{
+  "name": "@aic/integrations-radix",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "main": "./dist/integrations-radix/src/index.js",
+  "types": "./dist/integrations-radix/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/integrations-radix/src/index.d.ts",
+      "import": "./dist/integrations-radix/src/index.js",
+      "default": "./dist/integrations-radix/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@aic/sdk-react": "workspace:*",
+    "@aic/spec": "workspace:*"
+  }
+}

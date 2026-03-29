@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/agent.schema.json",
+  "title": "AIC Discovery Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["spec", "app", "capabilities", "endpoints", "generated_at"],
+  "properties": {
+    "spec": {
+      "const": "aic/0.1"
+    },
+    "manifest_version": {
+      "type": "string"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "framework": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "app": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "runtimeUiTree": {
+          "type": "boolean"
+        },
+        "semanticActions": {
+          "type": "boolean"
+        },
+        "workflows": {
+          "type": "boolean"
+        },
+        "permissions": {
+          "type": "boolean"
+        },
+        "events": {
+          "type": "boolean"
+        },
+        "actionContracts": {
+          "type": "boolean"
+        },
+        "entityModel": {
+          "type": "boolean"
+        },
+        "executionModel": {
+          "type": "boolean"
+        },
+        "recoveryModel": {
+          "type": "boolean"
+        }
+      }
+    },
+    "endpoints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ui": {
+          "type": "string"
+        },
+        "actions": {
+          "type": "string"
+        },
+        "permissions": {
+          "type": "string"
+        },
+        "workflows": {
+          "type": "string"
+        }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "deprecated_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "minimum_agent_version": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
