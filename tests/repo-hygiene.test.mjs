@@ -47,6 +47,8 @@ test("public launch files exist and README points to the public entrypoints", as
   assert.match(readme, /reference-consumer\.test\.mjs/);
   assert.match(readme, /coding-agents\.md/);
   assert.match(readme, /npm-packages\.md/);
+  assert.doesNotMatch(readme, /\]\(\/mnt\//);
+  assert.doesNotMatch(readme, /\]\([A-Za-z]:\//);
 });
 
 test("agent onboarding wrappers point back to the canonical AGENTS file", async () => {

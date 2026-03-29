@@ -25,13 +25,13 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 
 ## Start Here
 
-- [Next checkout example](/mnt/c/users/vatsa/agentinteractioncontrol/examples/nextjs-checkout-demo)
-- [Vite CRM example](/mnt/c/users/vatsa/agentinteractioncontrol/examples/react-basic)
-- [Bootstrap example](/mnt/c/users/vatsa/agentinteractioncontrol/examples/bootstrap-openai)
-- [Coding Agent Onboarding](/mnt/c/users/vatsa/agentinteractioncontrol/docs/coding-agents.md)
-- [npm Packages](/mnt/c/users/vatsa/agentinteractioncontrol/docs/npm-packages.md)
-- [Supported Today](/mnt/c/users/vatsa/agentinteractioncontrol/docs/supported-today.md)
-- [Reference consumer proof](/mnt/c/users/vatsa/agentinteractioncontrol/tests/reference-consumer.test.mjs)
+- [Next checkout example](./examples/nextjs-checkout-demo)
+- [Vite CRM example](./examples/react-basic)
+- [Bootstrap example](./examples/bootstrap-openai)
+- [Coding Agent Onboarding](./docs/coding-agents.md)
+- [npm Packages](./docs/npm-packages.md)
+- [Supported Today](./docs/supported-today.md)
+- [Reference consumer proof](./tests/reference-consumer.test.mjs)
 
 ## Repo Status
 
@@ -44,7 +44,7 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 - The first npm wave targets the core publishable packages under the existing `@aic/*` scope.
 - `@aic/devtools` and the example apps remain repo-only for now.
 - Package release plumbing uses Changesets plus a manual GitHub Actions publish workflow.
-- See [npm-packages.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/npm-packages.md) for the package matrix and install targets after publish.
+- See [npm-packages.md](./docs/npm-packages.md) for the package matrix and install targets after publish.
 
 ## What Exists Now
 
@@ -86,24 +86,24 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 
 ## Specs And Docs
 
-- Checked-in v1 JSON Schemas now live under [`schemas/`](/mnt/c/users/vatsa/agentinteractioncontrol/schemas).
+- Checked-in v1 JSON Schemas now live under [`schemas/`](./schemas/).
 - Contract and usage docs live in:
-  [manifest-spec.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/manifest-spec.md),
-  [coding-agents.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/coding-agents.md),
-  [npm-packages.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/npm-packages.md),
-  [sdk-api.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/sdk-api.md),
-  [threat-model.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/threat-model.md),
-  [release-checklist.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/release-checklist.md),
-  [supported-today.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/supported-today.md),
-  and [implementation-phases.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/implementation-phases.md).
+  [manifest-spec.md](./docs/manifest-spec.md),
+  [coding-agents.md](./docs/coding-agents.md),
+  [npm-packages.md](./docs/npm-packages.md),
+  [sdk-api.md](./docs/sdk-api.md),
+  [threat-model.md](./docs/threat-model.md),
+  [release-checklist.md](./docs/release-checklist.md),
+  [supported-today.md](./docs/supported-today.md),
+  and [implementation-phases.md](./docs/implementation-phases.md).
 
 ## Coding Agent Onboarding
 
-- The canonical coding-agent instructions for this repo live in [AGENTS.md](/mnt/c/users/vatsa/agentinteractioncontrol/AGENTS.md).
-- Tool-specific wrappers live in [CLAUDE.md](/mnt/c/users/vatsa/agentinteractioncontrol/CLAUDE.md), [GEMINI.md](/mnt/c/users/vatsa/agentinteractioncontrol/GEMINI.md), [.github/copilot-instructions.md](/mnt/c/users/vatsa/agentinteractioncontrol/.github/copilot-instructions.md), and [.cursor/rules/aic.mdc](/mnt/c/users/vatsa/agentinteractioncontrol/.cursor/rules/aic.mdc).
+- The canonical coding-agent instructions for this repo live in [AGENTS.md](./AGENTS.md).
+- Tool-specific wrappers live in [CLAUDE.md](./CLAUDE.md), [GEMINI.md](./GEMINI.md), [.github/copilot-instructions.md](./.github/copilot-instructions.md), and [.cursor/rules/aic.mdc](./.cursor/rules/aic.mdc).
 - Run `aic init [project-root]` to scaffold `aic.project.json` plus the recommended onboarding files into an app repo.
 - Run `aic doctor [project-root]` to audit config presence, onboarding files, scan coverage, diagnostics, and generated-manifest validity without mutating source files.
-- Copy-ready starter files still live under [templates/agent-onboarding](/mnt/c/users/vatsa/agentinteractioncontrol/templates/agent-onboarding) for manual or external-tool use.
+- Copy-ready starter files still live under [templates/agent-onboarding](./templates/agent-onboarding) for manual or external-tool use.
 - `aic generate project ... --out-dir ...` now records optional onboarding warnings in `report.json` when the recommended repo-level agent files are missing or stale.
 
 ## Key Idea
@@ -122,7 +122,7 @@ Expose what the page means, not what the DOM looks like.
 - Add `--prompt-file`, `--draft-file`, `--review-file`, and `--report-file` to write bootstrap artifacts to disk.
 - Use `--min-confidence` and `--max-suggestions` to keep the accepted draft subset deterministic while still preserving filtered suggestions inside the review bundle.
 
-See [examples/bootstrap-openai/README.md](/mnt/c/Users/vatsa/agentinteractioncontrol/examples/bootstrap-openai/README.md#L1) for a copyable OpenAI-based workflow from saved captures.
+See [examples/bootstrap-openai/README.md](./examples/bootstrap-openai/README.md) for a copyable OpenAI-based workflow from saved captures.
 
 ## Automation Flow
 
