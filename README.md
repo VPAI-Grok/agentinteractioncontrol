@@ -51,7 +51,7 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 - `@aic/spec`
   Rich discovery, runtime UI, permissions, workflows, action-contract, execution, recovery, validation, and browser-safe manifest diff models/helpers.
 - `@aic/automation-core`
-  Shared deterministic source scanning, diagnostics, project artifact generation, artifact writing, and CLI-facing manifest diff wrappers.
+  Shared deterministic source scanning, diagnostics, project artifact generation, artifact writing, onboarding init/doctor helpers, and CLI-facing manifest diff wrappers.
 - `@aic/runtime`
   Provenance-aware in-browser registry with runtime serialization helpers and event hooks.
 - `@aic/sdk-react`
@@ -61,7 +61,7 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 - `@aic/plugin-vite`
   Baseline Vite artifact-generation plus real source scanning helpers.
 - `@aic/cli`
-  Scan, validate, project generation, manifest diffing, bootstrap, and inspection commands.
+  Scan, init, doctor, validate, project generation, authoring-plan generation/apply, manifest diffing, bootstrap, and inspection commands.
 - `@aic/devtools`
   Runtime inspector overlay, opt-in live bridge, DOM discovery helpers, authoring patch-plan exports, and a browser-extension shell with popup plus DevTools panel assets.
 - `@aic/ai-bootstrap`
@@ -155,7 +155,7 @@ See [examples/bootstrap-openai/README.md](./examples/bootstrap-openai/README.md)
 - `pnpm check`
   Typechecks every workspace package and example.
 - `pnpm build`
-  Builds the published package entrypoints and example apps.
+  Builds the workspace packages and example apps.
 - `pnpm test`
   Rebuilds the workspace and runs contract tests for spec validation, runtime behavior, SDK rendering, plugin artifact generation, CLI flows, and bootstrap-provider adapters.
 - `pnpm test:goldens`
