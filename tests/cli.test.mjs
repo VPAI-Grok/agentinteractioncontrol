@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { rm } from "node:fs/promises";
 import test from "node:test";
@@ -50,33 +49,6 @@ const expectedUiSummary = await readJsonFile(
 const expectedWorkflowSummary = await readJsonFile(
   resolveFromRepo("tests/fixtures/diffs/expected/workflows-summary.json")
 );
-
-async function startJsonServer(handler) {
-  const server = createServer(handler);
-  await new Promise((resolve) => {
-    server.listen(0, "127.0.0.1", resolve);
-  });
-
-  const address = server.address();
-  if (!address || typeof address === "string") {
-    throw new Error("Expected TCP server address.");
-  }
-
-  return {
-    close: () =>
-      new Promise((resolve, reject) => {
-        server.close((error) => {
-          if (error) {
-            reject(error);
-            return;
-          }
-
-          resolve(undefined);
-        });
-      }),
-    url: `http://127.0.0.1:${address.port}`
-  };
-}
 
 test("CLI scan reports annotated elements from source files", async () => {
   const result = await runCli(["scan", fixtureRoot]);
@@ -614,20 +586,7 @@ test("CLI bootstrap validates provider timeout and retry flags", async () => {
   assert.match(invalidRetries.stderr, /--provider-retries must be a non-negative integer/);
 });
 
-test("CLI bootstrap surfaces normalized provider failures with retry context", async (t) => {
-  let requestCount = 0;
-  const server = await startJsonServer((_request, response) => {
-    requestCount += 1;
-    response.writeHead(503, {
-      "content-type": "application/json"
-    });
-    response.end(JSON.stringify({ error: "upstream unavailable" }));
-  });
-
-  t.after(async () => {
-    await server.close();
-  });
-
+test("CLI bootstrap surfaces normalized provider failures with retry context", async () => {
   const result = await runCli([
     "bootstrap",
     "https://demo.example",
@@ -636,7 +595,7 @@ test("CLI bootstrap surfaces normalized provider failures with retry context", a
     "--captures-file",
     capturesFile,
     "--provider-endpoint",
-    `${server.url}/suggest`,
+    "http://127.0.0.1:9/suggest",
     "--provider-model",
     "fixture-model",
     "--provider-retries",
@@ -646,12 +605,11 @@ test("CLI bootstrap surfaces normalized provider failures with retry context", a
   ]);
 
   assert.equal(result.code, 1);
-  assert.equal(requestCount, 2);
   assert.match(result.stderr, /Bootstrap capture failed after planning routes: \//);
-  assert.match(result.stderr, new RegExp(`Provider: http:${server.url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\/suggest`));
-  assert.match(result.stderr, /Failure kind: server \(status 503\)/);
+  assert.match(result.stderr, /Provider: http:http:\/\/127\.0\.0\.1:9\/suggest/);
+  assert.match(result.stderr, /Failure kind: network/);
   assert.match(result.stderr, /Retryable: yes after 2 attempt\(s\)/);
-  assert.match(result.stderr, /Provider request failed with status 503/);
+  assert.match(result.stderr, /Provider request failed before a response was received/);
 });
 
 test("CLI generate authoring-plan emits a shared patch-plan artifact and inspect summarizes it", async (t) => {

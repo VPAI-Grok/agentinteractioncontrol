@@ -20,8 +20,15 @@
 - GitHub issue and PR templates are present
 - CI workflow is enabled on the default branch
 
+## npm Alpha Release Gates
+
+- first-wave package manifests are public and include publish metadata
+- tarball smoke tests are green
+- package matrix docs match the current publish wave
+- manual publish workflow is configured with npm-token expectations documented
+
 ## Not In This Release
 
-- npm publishing
+- stable GA npm publishing
 - non-React platform support
 - heuristic repo mutation

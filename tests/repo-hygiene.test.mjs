@@ -16,6 +16,7 @@ const requiredFiles = [
   "GEMINI.md",
   "docs/release-checklist.md",
   "docs/coding-agents.md",
+  "docs/npm-packages.md",
   "docs/supported-today.md",
   ".github/copilot-instructions.md",
   ".github/skills/aic-onboarding/SKILL.md",
@@ -23,6 +24,7 @@ const requiredFiles = [
   ".github/ISSUE_TEMPLATE/bug_report.md",
   ".github/ISSUE_TEMPLATE/feature_request.md",
   ".github/pull_request_template.md",
+  ".github/workflows/publish-packages.yml",
   "templates/agent-onboarding/AGENTS.md",
   "templates/agent-onboarding/CLAUDE.md",
   "templates/agent-onboarding/GEMINI.md",
@@ -44,6 +46,7 @@ test("public launch files exist and README points to the public entrypoints", as
   assert.match(readme, /supported-today\.md/);
   assert.match(readme, /reference-consumer\.test\.mjs/);
   assert.match(readme, /coding-agents\.md/);
+  assert.match(readme, /npm-packages\.md/);
 });
 
 test("agent onboarding wrappers point back to the canonical AGENTS file", async () => {

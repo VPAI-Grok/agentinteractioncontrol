@@ -13,6 +13,7 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 - reference consumer proof showing external resolution by contract instead of selector-first fallbacks
 - explicit `@aic/*/client` entrypoints for Next/RSC-aware consumption of React-facing packages
 - coding-agent onboarding templates plus `aic init` and `aic doctor` for app repos adopting AIC
+- alpha npm packaging prep for the core `@aic/*` publish wave, including tarball smoke tests and a release workflow
 
 ## Not Guaranteed Yet
 
@@ -20,7 +21,7 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 - zero-touch onboarding of dynamic codebases
 - heuristic repo mutation
 - non-React production coverage
-- npm package publishing from this repo
+- live npm alpha publication from this repo has not happened yet
 
 ## Start Here
 
@@ -28,14 +29,22 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 - [Vite CRM example](/mnt/c/users/vatsa/agentinteractioncontrol/examples/react-basic)
 - [Bootstrap example](/mnt/c/users/vatsa/agentinteractioncontrol/examples/bootstrap-openai)
 - [Coding Agent Onboarding](/mnt/c/users/vatsa/agentinteractioncontrol/docs/coding-agents.md)
+- [npm Packages](/mnt/c/users/vatsa/agentinteractioncontrol/docs/npm-packages.md)
 - [Supported Today](/mnt/c/users/vatsa/agentinteractioncontrol/docs/supported-today.md)
 - [Reference consumer proof](/mnt/c/users/vatsa/agentinteractioncontrol/tests/reference-consumer.test.mjs)
 
 ## Repo Status
 
 - Public GitHub launch ready
-- Packages remain private in this milestone
-- npm publishing is intentionally deferred
+- First-wave packages are prepared for alpha npm publishing
+- Actual npm publication still requires a release run with npm credentials
+
+## npm Alpha Packaging
+
+- The first npm wave targets the core publishable packages under the existing `@aic/*` scope.
+- `@aic/devtools` and the example apps remain repo-only for now.
+- Package release plumbing uses Changesets plus a manual GitHub Actions publish workflow.
+- See [npm-packages.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/npm-packages.md) for the package matrix and install targets after publish.
 
 ## What Exists Now
 
@@ -81,6 +90,7 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 - Contract and usage docs live in:
   [manifest-spec.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/manifest-spec.md),
   [coding-agents.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/coding-agents.md),
+  [npm-packages.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/npm-packages.md),
   [sdk-api.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/sdk-api.md),
   [threat-model.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/threat-model.md),
   [release-checklist.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/release-checklist.md),

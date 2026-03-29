@@ -1,10 +1,21 @@
 {
   "name": "@aic/sdk-react",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.0",
   "type": "module",
-  "private": true,
+  "description": "React SDK for authoring AIC metadata and runtime registrations.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VPAI-Grok/agentinteractioncontrol.git"
+  },
+  "homepage": "https://github.com/VPAI-Grok/agentinteractioncontrol",
+  "bugs": {
+    "url": "https://github.com/VPAI-Grok/agentinteractioncontrol/issues"
+  },
+  "keywords": ["aic", "agents", "react", "sdk"],
   "main": "./dist/sdk-react/src/index.js",
   "types": "./dist/sdk-react/src/index.d.ts",
+  "files": ["dist"],
   "exports": {
     ".": {
       "types": "./dist/sdk-react/src/index.d.ts",
@@ -20,6 +31,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@aic/runtime": "workspace:*",

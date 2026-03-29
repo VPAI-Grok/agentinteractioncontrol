@@ -1,0 +1,48 @@
+name: Publish Packages
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish-alpha:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.8.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: pnpm
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck workspace
+        run: pnpm check
+
+      - name: Build workspace
+        run: pnpm build
+
+      - name: Verify contract tests
+        run: pnpm test:contracts
+
+      - name: Verify golden artifacts
+        run: pnpm test:goldens -- --actual-dir .artifacts/golden-review
+
+      - name: Verify npm packaging smoke tests
+        run: pnpm test:packaging
+
+      - name: Publish alpha packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm release:publish

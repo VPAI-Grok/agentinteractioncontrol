@@ -1,10 +1,21 @@
 {
   "name": "@aic/ai-bootstrap-openai",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.0",
   "type": "module",
-  "private": true,
+  "description": "OpenAI provider adapter for AIC bootstrap suggestions.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VPAI-Grok/agentinteractioncontrol.git"
+  },
+  "homepage": "https://github.com/VPAI-Grok/agentinteractioncontrol",
+  "bugs": {
+    "url": "https://github.com/VPAI-Grok/agentinteractioncontrol/issues"
+  },
+  "keywords": ["aic", "agents", "bootstrap", "openai"],
   "main": "./dist/ai-bootstrap-openai/src/index.js",
   "types": "./dist/ai-bootstrap-openai/src/index.d.ts",
+  "files": ["dist"],
   "exports": {
     ".": {
       "types": "./dist/ai-bootstrap-openai/src/index.d.ts",
@@ -15,6 +26,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@aic/ai-bootstrap": "workspace:*",

@@ -1,16 +1,30 @@
 {
   "name": "@aic/cli",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.0",
   "type": "module",
-  "private": true,
+  "description": "CLI for scanning, generating, bootstrapping, and inspecting AIC artifacts.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VPAI-Grok/agentinteractioncontrol.git"
+  },
+  "homepage": "https://github.com/VPAI-Grok/agentinteractioncontrol",
+  "bugs": {
+    "url": "https://github.com/VPAI-Grok/agentinteractioncontrol/issues"
+  },
+  "keywords": ["aic", "agents", "cli", "tooling"],
   "main": "./dist/cli/src/index.js",
   "types": "./dist/cli/src/index.d.ts",
+  "files": ["dist"],
   "bin": {
     "aic": "./dist/cli/src/index.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@aic/ai-bootstrap": "workspace:*",
