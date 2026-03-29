@@ -5,11 +5,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/VPAI-Grok/agentinteractioncontrol.git"
+    "url": "https://github.com/VPAI-Grok/AIC.git"
   },
-  "homepage": "https://github.com/VPAI-Grok/agentinteractioncontrol",
+  "homepage": "https://github.com/VPAI-Grok/AIC",
   "bugs": {
-    "url": "https://github.com/VPAI-Grok/agentinteractioncontrol/issues"
+    "url": "https://github.com/VPAI-Grok/AIC/issues"
   },
   "packageManager": "pnpm@10.8.1",
   "scripts": {

@@ -167,8 +167,8 @@ test("publish wave package manifests are public and alpha-versioned", async () =
     assert.deepEqual(packageJson.files, ["dist"]);
     assert.equal(typeof packageJson.description, "string");
     assert.equal(packageJson.license, "MIT");
-    assert.equal(packageJson.repository?.url, "https://github.com/VPAI-Grok/agentinteractioncontrol.git");
-    assert.equal(packageJson.bugs?.url, "https://github.com/VPAI-Grok/agentinteractioncontrol/issues");
+    assert.equal(packageJson.repository?.url, "https://github.com/VPAI-Grok/AIC.git");
+    assert.equal(packageJson.bugs?.url, "https://github.com/VPAI-Grok/AIC/issues");
     assert.ok(Array.isArray(packageJson.keywords));
 
     if (pkg.hasClientExport) {
