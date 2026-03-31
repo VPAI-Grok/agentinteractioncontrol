@@ -17,7 +17,8 @@
       "@aicorg/ai-bootstrap-http": ["packages/ai-bootstrap-http/src/index.ts"],
       "@aicorg/ai-bootstrap-openai": ["packages/ai-bootstrap-openai/src/index.ts"],
       "@aicorg/integrations-radix": ["packages/integrations-radix/src/index.ts"],
-      "@aicorg/integrations-shadcn": ["packages/integrations-shadcn/src/index.tsx"]
+      "@aicorg/integrations-shadcn": ["packages/integrations-shadcn/src/index.tsx"],
+      "@aicorg/mcp-server": ["packages/mcp-server/src/index.ts"]
     },
     "strict": true,
     "declaration": true,

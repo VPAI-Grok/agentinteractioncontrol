@@ -1,0 +1,41 @@
+{
+  "name": "@aicorg/mcp-server",
+  "version": "0.1.0-alpha.0",
+  "type": "module",
+  "description": "MCP server that exposes AIC manifests to AI agents for reliable web app operation.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VPAI-Grok/AIC.git"
+  },
+  "homepage": "https://github.com/VPAI-Grok/AIC",
+  "bugs": {
+    "url": "https://github.com/VPAI-Grok/AIC/issues"
+  },
+  "keywords": ["aic", "agents", "mcp", "model-context-protocol", "manifests"],
+  "bin": {
+    "aic-mcp-server": "./dist/mcp-server/src/index.js"
+  },
+  "main": "./dist/mcp-server/src/index.js",
+  "types": "./dist/mcp-server/src/index.d.ts",
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/mcp-server/src/index.d.ts",
+      "import": "./dist/mcp-server/src/index.js",
+      "default": "./dist/mcp-server/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@aicorg/spec": "workspace:*",
+    "zod": "^3.24.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

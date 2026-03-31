@@ -78,6 +78,12 @@ const publishablePackages = [
     hasClientExport: false,
     name: "@aicorg/ai-bootstrap-openai",
     path: "packages/ai-bootstrap-openai"
+  },
+  {
+    hasBin: "aic-mcp-server",
+    hasClientExport: false,
+    name: "@aicorg/mcp-server",
+    path: "packages/mcp-server"
   }
 ];
 
@@ -176,7 +182,8 @@ test("publish wave package manifests are public and alpha-versioned", async () =
     }
 
     if (pkg.hasBin) {
-      assert.equal(typeof packageJson.bin?.aic, "string");
+      const binKey = typeof pkg.hasBin === "string" ? pkg.hasBin : "aic";
+      assert.equal(typeof packageJson.bin?.[binKey], "string");
     }
   }
 });
@@ -222,8 +229,10 @@ test("packed npm tarballs rewrite workspace dependencies and only ship built fil
     }
 
     if (pkg.hasBin) {
-      assert.equal(packedManifest.bin?.aic, "./dist/cli/src/index.js");
-      assert.ok(members.includes("package/dist/cli/src/index.js"));
+      const binKey = typeof pkg.hasBin === "string" ? pkg.hasBin : "aic";
+      assert.equal(typeof packedManifest.bin?.[binKey], "string");
+      const binPath = packedManifest.bin[binKey];
+      assert.ok(members.some((m) => m.includes(binPath.replace("./", ""))));
     }
   }
 });

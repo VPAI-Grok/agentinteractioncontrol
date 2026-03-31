@@ -18,6 +18,7 @@ The core `@aicorg/*` packages are now published to npm under the `alpha` tag.
 | `@aicorg/ai-bootstrap` | Bootstrap prompt and review tooling |
 | `@aicorg/ai-bootstrap-http` | Generic HTTP bootstrap provider adapter |
 | `@aicorg/ai-bootstrap-openai` | OpenAI bootstrap provider adapter |
+| `@aicorg/mcp-server` | MCP server exposing AIC manifests to AI agents |
 
 ## Deferred From The First npm Wave
 
@@ -50,6 +51,12 @@ Bootstrap providers:
 
 ```bash
 pnpm add @aicorg/ai-bootstrap @aicorg/ai-bootstrap-http @aicorg/ai-bootstrap-openai
+```
+
+MCP server for AI agent integration (Claude Desktop, Cursor, etc.):
+
+```bash
+npx @aicorg/mcp-server
 ```
 
 ## Release Notes

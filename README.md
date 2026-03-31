@@ -14,6 +14,26 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 - explicit `@aicorg/*/client` entrypoints for Next/RSC-aware consumption of React-facing packages
 - coding-agent onboarding templates plus `aic init` and `aic doctor` for app repos adopting AIC
 - alpha npm packages are live for the core `@aicorg/*` publish wave, with tarball smoke tests and a release workflow backing the release process
+- **MCP server** lets Claude Desktop, Cursor, and other MCP-compatible agents discover and reason about AIC-instrumented apps natively
+
+## MCP Server
+
+Any MCP-compatible AI agent can connect to an AIC-instrumented app:
+
+```json
+{
+  "mcpServers": {
+    "aic": {
+      "command": "npx",
+      "args": ["-y", "@aicorg/mcp-server"]
+    }
+  }
+}
+```
+
+This gives the agent 6 read-only tools to discover app capabilities, inspect UI elements, filter by risk/role/entity, read permissions and workflows, and understand semantic action contracts.
+
+See [docs/mcp-server.md](./docs/mcp-server.md) for full setup and tool reference.
 
 ## Not Guaranteed Yet
 
@@ -25,6 +45,7 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 
 ## Start Here
 
+- [MCP Server (Claude Desktop / Cursor)](./docs/mcp-server.md)
 - [Next checkout example](./examples/nextjs-checkout-demo)
 - [Vite CRM example](./examples/react-basic)
 - [Bootstrap example](./examples/bootstrap-openai)
@@ -72,6 +93,8 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
   OpenAI Responses/Structured Outputs adapter for bootstrap suggestion generation.
 - `@aicorg/integrations-radix` and `@aicorg/integrations-shadcn`
   Practical adapter coverage for common dialog, dropdown/menu, select, checkbox, switch, and tabs usage.
+- `@aicorg/mcp-server`
+  MCP server exposing AIC manifests to Claude Desktop, Cursor, and other MCP-compatible agents with 6 read-only tools for discovery, UI inspection, element filtering, permissions, workflows, and semantic actions.
 - examples
   A Vite CRM demo, a Next checkout demo proving serious-workflow metadata, and an OpenAI bootstrap example from saved captures.
 
@@ -91,6 +114,7 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
   [manifest-spec.md](./docs/manifest-spec.md),
   [coding-agents.md](./docs/coding-agents.md),
   [npm-packages.md](./docs/npm-packages.md),
+  [mcp-server.md](./docs/mcp-server.md),
   [sdk-api.md](./docs/sdk-api.md),
   [threat-model.md](./docs/threat-model.md),
   [release-checklist.md](./docs/release-checklist.md),
