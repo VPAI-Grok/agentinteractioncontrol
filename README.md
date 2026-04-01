@@ -24,7 +24,7 @@ If you are evaluating the project quickly, the shortest useful mental model is:
 
 That makes AIC useful anywhere an app owner wants stronger guarantees around agent behavior, especially for risky actions, record-scoped operations, multi-step workflows, and UI flows where “click the thing that looks right” is not good enough.
 
-The repository is source-available under `PolyForm-Noncommercial-1.0.0`. Personal, research, evaluation, and other noncommercial use is allowed under that license, but direct commercial monetization is not.
+The repository is open under `Apache-2.0`. The immediate goal is adoption: let teams use AIC freely, including in commercial environments, and build the business around implementation, support, integration work, and hosted value around the ecosystem rather than permission to use the code.
 
 ## What Works Today
 
@@ -82,6 +82,14 @@ See [docs/mcp-server.md](./docs/mcp-server.md) for full setup and tool reference
 - Public GitHub launch ready
 - First-wave `@aicorg/*` packages are published to npm under the `alpha` tag
 - Further package releases still go through the GitHub publish workflow
+- Repo and publishable packages use `Apache-2.0`
+
+## Adoption and Business Model
+
+- AIC is open for commercial and noncommercial use under Apache-2.0.
+- The project does not currently force public product-level attribution from every user.
+- The repository includes a [NOTICE](./NOTICE) file for redistribution attribution and a voluntary attribution request in [SERVICES.md](./SERVICES.md).
+- The recommended monetization path is services and ecosystem value: onboarding, implementation, MCP integration, support, and future hosted capabilities.
 
 ## npm Alpha Packaging
 
