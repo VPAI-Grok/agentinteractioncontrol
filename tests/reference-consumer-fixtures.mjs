@@ -10,7 +10,9 @@ const automationCore = await importWorkspaceModule(
   "packages/automation-core/dist/automation-core/src/index.js"
 );
 const runtime = await importWorkspaceModule("packages/runtime/dist/runtime/src/index.js");
-const sdkReact = await importWorkspaceModule("packages/sdk-react/dist/sdk-react/src/index.js");
+const sdkReact = await importWorkspaceModule(
+  "packages/integrations-shadcn/node_modules/@aicorg/sdk-react/dist/sdk-react/src/index.js"
+);
 const shadcn = await importWorkspaceModule(
   "packages/integrations-shadcn/dist/integrations-shadcn/src/index.js"
 );

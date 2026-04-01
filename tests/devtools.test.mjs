@@ -9,8 +9,12 @@ import { importWorkspaceModule, resolveFromRepo } from "./helpers.mjs";
 
 const devtools = await importWorkspaceModule("packages/devtools/dist/devtools/src/index.js");
 const devtoolsClient = await importWorkspaceModule("packages/devtools/dist/devtools/src/client.js");
-const runtime = await importWorkspaceModule("packages/runtime/dist/runtime/src/index.js");
-const sdkReact = await importWorkspaceModule("packages/sdk-react/dist/sdk-react/src/index.js");
+const runtime = await importWorkspaceModule(
+  "packages/devtools/node_modules/@aicorg/runtime/dist/runtime/src/index.js"
+);
+const sdkReact = await importWorkspaceModule(
+  "packages/devtools/node_modules/@aicorg/sdk-react/dist/sdk-react/src/index.js"
+);
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 

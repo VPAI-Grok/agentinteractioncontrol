@@ -7,7 +7,9 @@ import TestRenderer, { act } from "react-test-renderer";
 
 import { importWorkspaceModule, resolveFromRepo } from "./helpers.mjs";
 
-const sdkReact = await importWorkspaceModule("packages/sdk-react/dist/sdk-react/src/index.js");
+const sdkReact = await importWorkspaceModule(
+  "packages/integrations-shadcn/node_modules/@aicorg/sdk-react/dist/sdk-react/src/index.js"
+);
 const shadcn = await importWorkspaceModule(
   "packages/integrations-shadcn/dist/integrations-shadcn/src/index.js"
 );

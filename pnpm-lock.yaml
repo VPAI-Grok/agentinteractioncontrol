@@ -38,6 +38,10 @@ importers:
       typescript:
         specifier: ^5.8.2
         version: 5.9.3
+    optionalDependencies:
+      '@rollup/rollup-linux-x64-gnu':
+        specifier: 4.60.0
+        version: 4.60.0
 
   examples/bootstrap-openai: {}
 

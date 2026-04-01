@@ -15,7 +15,9 @@ const shadcn = await importWorkspaceModule(
 const shadcnClient = await importWorkspaceModule(
   "packages/integrations-shadcn/dist/integrations-shadcn/src/client.js"
 );
-const sdkReact = await importWorkspaceModule("packages/sdk-react/dist/sdk-react/src/index.js");
+const sdkReact = await importWorkspaceModule(
+  "packages/integrations-shadcn/node_modules/@aicorg/sdk-react/dist/sdk-react/src/index.js"
+);
 const runtime = await importWorkspaceModule("packages/runtime/dist/runtime/src/index.js");
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
