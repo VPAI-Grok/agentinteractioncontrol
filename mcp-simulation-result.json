@@ -1,8 +1,0 @@
-{
-  "content": [
-    {
-      "type": "text",
-      "text": "{\"success\":false,\"error\":\"Failed to fetch http://foo.bar/.well-known/agent/ui: fetch failed\"}"
-    }
-  ]
-}
