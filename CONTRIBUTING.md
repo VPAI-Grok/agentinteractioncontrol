@@ -2,7 +2,7 @@
 
 ## Working Agreement
 
-- Keep changes aligned with the current supported boundary in [docs/supported-today.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/supported-today.md).
+- Keep changes aligned with the current supported boundary in [docs/supported-today.md](./docs/supported-today.md).
 - Prefer explicit contract improvements over heuristic behavior.
 - Do not broaden repo mutation, extraction, or provider behavior without tests and docs in the same change.
 
@@ -20,9 +20,19 @@
 - Update docs when the public behavior or supported boundary changes.
 - Include tests for any behavior change.
 - Call out intentional contract changes in the PR description.
+- Significant external contributions may be held until contributor licensing terms are in place.
+- By opening a pull request, you acknowledge that maintainers may ask for a contributor agreement before merging work that affects future relicensing flexibility.
 
 ## Ground Rules
 
 - The CLI is the only supported repo-mutation path.
 - Runtime UI is the authoritative source for rich per-element metadata.
 - Bootstrap suggestions remain review inputs, not a source of truth.
+
+## Licensing Flexibility
+
+- The repository is currently licensed under Apache-2.0 to maximize adoption.
+- That does not guarantee future versions will always use the same license.
+- Already-released Apache-2.0 versions remain under Apache-2.0 for recipients of those versions.
+- To preserve future licensing flexibility, maintainers may prefer small patches, documentation fixes, issue reports, and design discussion unless or until a formal contributor licensing process is established.
+- See [CONTRIBUTOR-LICENSING.md](./CONTRIBUTOR-LICENSING.md) for the current project policy.

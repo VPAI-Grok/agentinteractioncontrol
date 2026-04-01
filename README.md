@@ -90,6 +90,7 @@ See [docs/mcp-server.md](./docs/mcp-server.md) for full setup and tool reference
 - The project does not currently force public product-level attribution from every user.
 - The repository includes a [NOTICE](./NOTICE) file for redistribution attribution and a voluntary attribution request in [SERVICES.md](./SERVICES.md).
 - The recommended monetization path is services and ecosystem value: onboarding, implementation, MCP integration, support, and future hosted capabilities.
+- To preserve future licensing flexibility, see the current [CONTRIBUTOR-LICENSING.md](./CONTRIBUTOR-LICENSING.md) policy for outside code contributions.
 
 ## npm Alpha Packaging
 
