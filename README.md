@@ -66,6 +66,8 @@ We ran a real browser agent benchmark on the [TailAdmin dashboard](./examples/ta
 
 > These are real browser-agent runs — not synthetic tests, not simulations. The agent opened a browser, navigated the UI, filled forms, and verified results. [Full report →](./docs/tailadmin-benchmark-claude-2026-04-02.md)
 
+We also ran a real-app adoption benchmark on a patched local fork of **Twenty CRM**. The current official measured slice is green on detail navigation, destructive safety, record-scoped note creation, record-scoped task creation, a list-level sort workflow, a full list-level filter workflow, record-level stage mutation, and active filter clear, with AIC improving contract correctness from `0.40 -> 0.90` on detail navigation, from `0.60 -> 1.00` on destructive cancel, from `0.35 -> 0.95` on note creation, from `0.40 -> 0.95` on task creation, from `0.45 -> 0.95` on list sort plus record open, from `0.50 -> 0.95` on list filter plus record open, from `0.50 -> 0.90` on stage mutation, and from `0.55 -> 1.00` on list filter clear. [Twenty report →](./benchmarks/twenty-adoption/benchmark-report-official.md)
+
 ---
 
 ## 🗺️ How AIC Works
@@ -201,6 +203,10 @@ const { attributes } = useAICElement({
 | ⚛️ Instrument a React/Next.js app | [Next.js Checkout Example](./examples/nextjs-checkout-demo) |
 | ⚡ Instrument a Vite/React app | [Vite CRM Example](./examples/react-basic) |
 | 📊 See real benchmark results | [TailAdmin Benchmark Report](./docs/tailadmin-benchmark-claude-2026-04-02.md) |
+| 🧪 See the real-app Twenty benchmark | [Twenty Official Benchmark Report](./benchmarks/twenty-adoption/benchmark-report-official.md) |
+| 🧪 Plan a real-app adoption benchmark | [Twenty Adoption Benchmark](./benchmarks/twenty-adoption/README.md) |
+| 🧩 See the real Twenty integration map | [Twenty Instrumentation Plan](./benchmarks/twenty-adoption/instrumentation-plan.md) |
+| 🛠️ Patch a real Twenty fork | [Twenty Local Integration Notes](./benchmarks/twenty-adoption/local-integration-notes.md) |
 | 🧪 See a TodoMVC MCP benchmark | [TodoMVC Example](./examples/todomvc-react) |
 | 🤖 Use AI to bootstrap annotations | [Bootstrap Example](./examples/bootstrap-openai) |
 | 👩‍💻 Onboard a coding agent (Claude, Gemini, Copilot) | [Coding Agent Onboarding](./docs/coding-agents.md) |
