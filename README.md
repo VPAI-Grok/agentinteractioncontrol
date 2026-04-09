@@ -319,6 +319,7 @@ Imagine hiring a new employee to use your software. Without documentation, they'
 
 | Doc | What It Covers |
 |-----|---------------|
+| [architecture.md](./docs/architecture.md) | Full system architecture diagram — packages, data flows, manifests, CLI, MCP |
 | [manifest-spec.md](./docs/manifest-spec.md) | Full manifest shape reference |
 | [sdk-api.md](./docs/sdk-api.md) | React SDK hooks and props |
 | [mcp-server.md](./docs/mcp-server.md) | MCP server setup and tool reference |

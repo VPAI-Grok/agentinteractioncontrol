@@ -1,203 +1,417 @@
-# AIC Architecture Notes
+# AIC — Agent Interaction Control: Full Architecture
 
-The repo is now aligned to the master-spec core platform rather than the earlier thin prototype.
+## System Overview
 
-## Current Core Packages
+AIC is a **contract-first framework** that makes web apps reliably operable by AI agents. It does this by:
 
-- `@aicorg/spec`
-  The source of truth for discovery, runtime UI, permissions, workflows, semantic actions, action contracts, entity refs, execution metadata, recovery metadata, confirmation, validation, and browser-safe manifest diff helpers.
-- `@aicorg/automation-core`
-  The shared source-to-artifact layer. It scans source files, emits deterministic diagnostics, generates project manifests, writes artifact files, creates review reports, and reuses the shared manifest diff helpers.
-- `@aicorg/runtime`
-  The live registry and serializer layer. It merges provenance sources in this order: `ai_suggested`, `inferred`, `authored`.
-- `@aicorg/sdk-react`
-  The React-first API surface. `AICProvider`, `useAICRegistry`, `useAICElement`, and `AIC.*` wrappers are preferred. `Agent*` exports remain compatibility aliases.
-- `@aicorg/plugin-next` and `@aicorg/plugin-vite`
-  Framework-facing wrappers over the shared automation core.
-- `@aicorg/cli`
-  Source scanning, validation, project generation, diffing, manifest inspection, and Playwright-backed bootstrap entrypoints.
-- `@aicorg/devtools`
-  The development-time inspection and authoring layer. It now supports an opt-in React bridge, an in-app overlay, DOM discovery helpers, and a Chrome-first extension shell with popup plus DevTools panel assets.
-- `@aicorg/ai-bootstrap-http`
-  A concrete HTTP adapter that turns the generic bootstrap model-client contract into a simple JSON POST integration.
-- `@aicorg/ai-bootstrap-openai`
-  A provider-specific adapter that targets the OpenAI Responses API with Structured Outputs.
+1. **Authoring** — developers annotate UI elements with stable `agent*` props
+2. **Generating** — build-time tools extract those annotations into standardized JSON manifests
+3. **Serving** — framework plugins expose manifests on `.well-known/` HTTP endpoints at runtime
+4. **Consuming** — the MCP server exposes those manifests as tools that any AI agent can call
 
-## Contract Model
+---
 
-### Discovery
+## Package Dependency Graph
 
-Discovery is served from `/.well-known/agent.json` and includes:
+```mermaid
+graph TD
+    subgraph SPEC["📐 @aicorg/spec — Source of Truth"]
+        types["types.ts (all AIC types)"]
+        authoring["authoring.ts (patch plan builder)"]
+        validate["validate.ts (manifest validators)"]
+        diff["diff.ts (manifest diff engine)"]
+    end
 
-- `spec`
-- `app`
-- `capabilities`
-- `endpoints`
-- optional `framework`, `generated_at`, `manifest_version`, `notes`, and compatibility metadata
+    subgraph RUNTIME["⚙️ @aicorg/runtime"]
+        registry["AICRegistry (in-memory element store)"]
+        attributes["createAICDataAttributes (data-agent-* attrs)"]
+    end
 
-### Runtime UI
+    subgraph SDK["⚛️ @aicorg/sdk-react"]
+        provider["AICProvider (React context)"]
+        useElement["useAICElement hook"]
+        components["AIC.Button / Input / Select / Form / Table"]
+        createComp["createAICComponent factory"]
+    end
 
-The runtime manifest describes the live interface and includes:
+    subgraph AUTOMATION["🔧 @aicorg/automation-core"]
+        scanner["scanSourceForAICAnnotations (TypeScript AST)"]
+        analyzer["analyzeProjectForAICAnnotations (file walker)"]
+        generator["generateProjectArtifacts (manifest builder)"]
+        doctor["createAICDoctorReport"]
+        initializer["initializeAICProject (scaffolding)"]
+        writer["writeArtifactFiles"]
+    end
 
-- `page`
-- `view`
-- `user_context`
-- `elements`
-- `relationships`
-- `updated_at`
+    subgraph BOOTSTRAP["🤖 @aicorg/ai-bootstrap"]
+        crawler["capturePagesWithPlaywright"]
+        promptBuilder["createBootstrapSuggestionPrompt"]
+        reviewer["generateBootstrapReview"]
+        reporter["renderBootstrapReport"]
+    end
 
-Each element carries:
+    subgraph BOOTSTRAP_HTTP["🌐 @aicorg/ai-bootstrap-http"]
+        httpProvider["createHttpBootstrapSuggestionProvider"]
+    end
 
-- stable ID, role, label, description
-- actions and effects
-- risk, confirmation, validation, and recovery metadata
-- entity references
-- execution metadata
-- workflow references
-- provenance metadata
+    subgraph BOOTSTRAP_OAI["🔑 @aicorg/ai-bootstrap-openai"]
+        openaiProvider["createOpenAIBootstrapSuggestionProvider"]
+    end
 
-### Validation and Safety
+    subgraph CLI["🖥️ @aicorg/cli (aic)"]
+        cmd_scan["aic scan"]
+        cmd_init["aic init"]
+        cmd_doctor["aic doctor"]
+        cmd_validate["aic validate"]
+        cmd_bootstrap["aic bootstrap"]
+        cmd_generate["aic generate project/discovery/ui/permissions/operate"]
+        cmd_authoring["aic generate authoring-plan"]
+        cmd_apply["aic apply authoring-plan"]
+        cmd_diff["aic diff"]
+        cmd_inspect["aic inspect"]
+    end
 
-Blocking rules currently enforced:
+    subgraph MCP["🔌 @aicorg/mcp-server"]
+        tool_discover["discover_aic_app"]
+        tool_ui["get_aic_ui_state"]
+        tool_elements["list_aic_elements"]
+        tool_permissions["get_aic_permissions"]
+        tool_workflows["get_aic_workflows"]
+        tool_actions["get_aic_actions"]
+    end
 
-- duplicate IDs
-- malformed discovery/runtime/permissions/workflow/action manifests
-- critical actions without structured confirmation
-- action contracts missing completion or failure semantics
+    subgraph DEVTOOLS["🔍 @aicorg/devtools"]
+        bridge["AICDevtoolsBridge (throttled snapshot dispatcher)"]
+        overlay["AICDevtoolsOverlay (inspector UI)"]
+        inspectorHook["useAICInspectorSnapshot"]
+        domCandidates["collectAICDomDiscoveryCandidates"]
+        extensionShell["createAICDevtoolsExtensionShell"]
+    end
 
-Warnings currently enforced:
+    subgraph PLUGINS["🔗 Framework Plugins"]
+        pluginVite["@aicorg/plugin-vite createAICVitePlugin"]
+        pluginNext["@aicorg/plugin-next createAICNextPlugin"]
+    end
 
-- row- or grid-associated actions without entity identity
-- async elements without described effects
-- unknown action names outside semantic-action contexts
+    subgraph INTEGRATIONS["🎨 Component Integrations"]
+        radix["@aicorg/integrations-radix"]
+        shadcn["@aicorg/integrations-shadcn"]
+    end
 
-## Automation Model
+    RUNTIME --> SPEC
+    SDK --> RUNTIME
+    SDK --> SPEC
+    AUTOMATION --> RUNTIME
+    AUTOMATION --> SPEC
+    PLUGINS --> AUTOMATION
+    PLUGINS --> SPEC
+    CLI --> AUTOMATION
+    CLI --> BOOTSTRAP
+    CLI --> BOOTSTRAP_HTTP
+    CLI --> BOOTSTRAP_OAI
+    CLI --> RUNTIME
+    CLI --> SPEC
+    MCP --> SPEC
+    DEVTOOLS --> SDK
+    DEVTOOLS --> SPEC
+    BOOTSTRAP_HTTP --> BOOTSTRAP
+    BOOTSTRAP_OAI --> BOOTSTRAP
+    INTEGRATIONS --> SDK
+```
 
-The shared automation pipeline currently supports only deterministic extraction:
+---
 
-- direct string literals
-- no-substitution template literals
-- same-file const alias chains
-- property access or string-literal bracket access on same-file const object literals
-- same-file zero-arg helpers with a single static return expression
+## Runtime Data Flow (App in Browser)
 
-Unsupported dynamic expressions are skipped with diagnostics. The pipeline does not attempt cross-module inference or runtime evaluation, and imported or effectful helpers remain out of scope.
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant JSX as React Component (JSX)
+    participant Hook as useAICElement
+    participant Reg as AICRegistry
+    participant DOM as DOM (data-agent-* attrs)
+    participant Agent as AI Agent / MCP
 
-Project-level generation now emits the full artifact set from one config:
+    Dev->>JSX: Add agentId, agentRisk, agentDescription, etc.
+    JSX->>Hook: useAICElement(props, options)
+    Hook->>Hook: buildElementManifest(props)
+    Hook->>Reg: registry.register(element, instanceId, authored)
+    Reg->>Reg: mergeElementSources (authored > inferred > ai_suggested)
+    Reg->>Reg: emit element_registered event
+    Hook->>DOM: createAICDataAttributes(element)
+    Note over DOM: data-agent-id, data-agent-role, data-agent-risk, data-agent-action, data-agent-entity-*, data-agent-workflow
+    Agent->>DOM: GET /.well-known/agent/ui
+    DOM-->>Agent: AICRuntimeUiManifest (JSON)
+```
 
-- discovery
-- runtime UI
-- semantic actions
-- permissions
-- workflows
-- `operate.txt`
+---
 
-When the CLI writes a project to disk, it also emits a `report.json` review file containing:
+## Build-Time Artifact Generation Flow
 
-- framework
-- files scanned
-- extracted matches
-- deterministic source inventory entries for exact apply matching
-- deterministic diagnostics
+```mermaid
+flowchart LR
+    SRC["Source Files (.tsx / .jsx)"]
 
-## Devtools Model
+    subgraph AUTOMATION_CORE["@aicorg/automation-core"]
+        TS["TypeScript AST Parser"]
+        SCANNER["scanSourceForAICAnnotations → AICSourceScanMatch[]"]
+        GENERATOR["generateProjectArtifacts"]
+    end
 
-The devtools workflow now has two data sources:
+    CONFIG["aic.project.json"]
 
-- live bridge snapshots emitted from `AICDevtoolsBridge`
-- endpoint fallback reads from `/.well-known/agent/ui`
+    subgraph ARTIFACTS["Generated .well-known Artifacts"]
+        A1["/.well-known/agent.json (discovery)"]
+        A2["/.well-known/agent/ui (runtime UI manifest)"]
+        A3["/.well-known/agent/actions (semantic actions)"]
+        A4["/agent-permissions.json"]
+        A5["/agent-workflows.json"]
+        A6["/operate.txt (agent instructions)"]
+        A7["/report.json (onboarding report)"]
+    end
 
-The authoring workflow adds two optional augmentation sources:
+    SRC --> TS --> SCANNER --> GENERATOR
+    CONFIG --> GENERATOR
+    GENERATOR --> ARTIFACTS
+```
 
-- on-demand DOM discovery candidates for currently unannotated controls
-- imported project `report.json` and bootstrap `review.json` artifacts for source resolution and suggestion enrichment
+---
 
-The bridge dispatches a browser event carrying:
+## Well-Known Endpoint Map
 
-- `version`
-- `captured_at`
-- `source`
-- `manifest`
+| Endpoint | Manifest Type | Description |
+|---|---|---|
+| `/.well-known/agent.json` | `AICDiscoveryManifest` | App name, version, supported capabilities, endpoint URLs |
+| `/.well-known/agent/ui` | `AICRuntimeUiManifest` | All rendered elements with full metadata |
+| `/.well-known/agent/actions` | `AICSemanticActionsManifest` | Pre/post-conditions, completion signals, side-effects |
+| `/agent-permissions.json` | `AICPermissionsManifest` | Risk-band policies, forbidden actions, reauth requirements |
+| `/agent-workflows.json` | `AICWorkflowManifest` | Named multi-step workflows with entry points & rollback |
+| `/operate.txt` | Plain text | Human-readable AIC summary for agent system prompts |
 
-The extension stores the latest snapshot by tab and the panel renders:
+---
 
-- connection state
-- filterable element list
-- selected-element detail
-- baseline-vs-current UI diff
-- raw JSON export
-- authoring proposals with ready / unresolved / ignored states plus apply eligibility
-- copyable prop snippets plus exported patch-plan JSON and summary text
+## MCP Server — AI Agent-Facing Tools
 
-Repo mutation stays outside the extension. The write path now lives in the CLI:
+```mermaid
+flowchart TD
+    AGENT["AI Agent (Claude, Gemini, GPT, etc.)"]
 
-- `aic apply authoring-plan <plan-file> --project-root <dir>` runs a dry-run apply
-- adding `--write` performs guarded in-place JSX prop edits for exact source matches only
-- drifted, ambiguous, review-only, or ignored proposals are skipped instead of guessed
+    subgraph MCP_SERVER["@aicorg/mcp-server (stdio transport)"]
+        T1["discover_aic_app → GET /.well-known/agent.json"]
+        T2["get_aic_ui_state → GET /.well-known/agent/ui"]
+        T3["list_aic_elements → GET /.well-known/agent/ui + filter"]
+        T4["get_aic_permissions → GET /agent-permissions.json"]
+        T5["get_aic_workflows → GET /agent-workflows.json"]
+        T6["get_aic_actions → GET /.well-known/agent/actions"]
+    end
 
-## Near-Term Direction
+    APP["Running Web App (with AIC plugin)"]
 
-The current codebase now covers the master-spec core platform plus read-only devtools authoring plus a first guarded CLI apply path. The next substantial layers are:
+    AGENT -->|MCP protocol| MCP_SERVER
+    MCP_SERVER -->|HTTP fetch| APP
+    APP -->|JSON manifests| MCP_SERVER
+    MCP_SERVER -->|structured results| AGENT
+```
 
-- richer model-provider integrations on top of the current bootstrap prompt/provider pipeline
-- broader table/card/list semantics and deeper design-system adoption beyond the current control-layer Radix/shadcn coverage
-- potentially broader static extraction only if it remains deterministic and reviewable
-- deeper write-back support beyond in-place JSX prop edits, including broader source inventories and more complex component patterns
+---
 
-## Example Proof Surface
+## Bootstrap Pipeline (AI-Assisted Annotation)
 
-The example apps now act as the primary proof surface for the current contract claims:
+```mermaid
+flowchart TD
+    URL["Target App URL (+ optional routes CSV)"]
+    PW["Playwright: capturePagesWithPlaywright"]
+    CAPTURES["Page Captures (DOM snapshots)"]
+    PROMPT["createBootstrapSuggestionPrompt"]
 
-- `examples/nextjs-checkout-demo` demonstrates critical confirmation, async execution plus recovery, validation-bearing checkout inputs, and entity-bound order-line actions.
-- `examples/react-basic` demonstrates CRM-oriented confirmation, execution, recovery, workflow references, and validation-bearing note capture on the shadcn wrapper surface.
+    subgraph PROVIDERS["Suggestion Providers"]
+        HTTP["HTTP Provider (custom LLM endpoint)"]
+        OPENAI["OpenAI Provider (gpt-4o etc.)"]
+        STATIC["Static Provider (from file, for testing)"]
+    end
 
-Contract tests render these example metadata flows and validate the serialized runtime manifests directly so the examples remain aligned with the supported product boundary.
+    DRAFT["Bootstrap Draft (raw AI suggestions)"]
+    REVIEW["generateBootstrapReview (confidence filter, deduplication)"]
+    REPORT["Bootstrap Report (markdown summary)"]
+    PLAN["aic generate authoring-plan → AICAuthoringPatchPlan"]
+    APPLY["aic apply authoring-plan → writes agent* props to JSX"]
 
-## Stabilization Gates
+    URL --> PW --> CAPTURES --> PROMPT
+    PROMPT --> HTTP
+    PROMPT --> OPENAI
+    PROMPT --> STATIC
+    HTTP --> DRAFT
+    OPENAI --> DRAFT
+    STATIC --> DRAFT
+    DRAFT --> REVIEW --> REPORT
+    REVIEW --> PLAN --> APPLY
+```
 
-The repo now treats correctness as a first-class concern:
+---
 
-- fixture-backed contract tests cover spec validation, runtime merging, SDK rendering, plugin artifact generation, CLI commands, and bootstrap provider adapters
-- checked-in golden artifact directories provide a file-level review surface for source-to-manifest changes
-- CI runs `pnpm check`, `pnpm build`, `pnpm test:goldens`, and `pnpm test:contracts`
-- plugin and CLI verification is based on explicit, deterministic annotations rather than inferred dynamic behavior
-- extraction warnings remain non-blocking by default, but expected diagnostics are asserted so drift fails review
+## CLI Command Reference
 
-The intended baseline workflow for contributors is:
+| Command | Purpose |
+|---|---|
+| `aic init [root]` | Scaffold `aic.project.json`, `AGENTS.md`, `GEMINI.md`, `CLAUDE.md`, `.cursor/rules/aic.mdc` |
+| `aic scan <path>` | AST-scan for `agent*` props → JSON report of matches & diagnostics |
+| `aic doctor [root]` | Audit onboarding files, config, source annotations, and workflows |
+| `aic validate <kind> <file>` | Validate a manifest JSON against the spec schema |
+| `aic bootstrap <url>` | Crawl with Playwright → LLM suggestions → bootstrap draft & report |
+| `aic generate project <config>` | Full artifact generation from `aic.project.json` |
+| `aic generate authoring-plan` | Build a proposal list from a runtime snapshot + bootstrap review |
+| `aic apply authoring-plan` | Patch JSX source files with `agent*` props from a plan |
+| `aic diff <kind> <before> <after>` | Diff two manifest versions (summary or detailed) |
+| `aic inspect <file>` | Pretty-print and describe a manifest file |
 
-1. update code and fixtures together when contract output changes
-2. run `pnpm test:update-goldens`
-3. inspect the expected manifest file diffs
-4. run `pnpm test:goldens`
-5. run `pnpm test`
+---
 
-## Bootstrap Provider Path
+## AIC Spec — Core Type Hierarchy
 
-`@aicorg/ai-bootstrap` now supports three suggestion modes:
+```mermaid
+classDiagram
+    class AICElementManifest {
+        +string id
+        +string label
+        +AICRole role
+        +AICRisk risk
+        +AICElementAction[] actions
+        +AICElementState state
+        +AICConfirmationProtocol confirmation
+        +AICEntityRef entity_ref
+        +AICExecutionMetadata execution
+        +AICRecoveryMetadata recovery
+        +AICValidationMetadata validation
+        +string workflow_ref
+        +AICRiskFlag[] risk_flags
+    }
 
-- heuristic generation directly from captures
-- static/file-backed suggestions for offline review workflows
-- structured model providers via a generic `completeJson(...)` client contract
+    class AICRuntimeUiManifest {
+        +string spec
+        +AICPageMetadata page
+        +AICViewMetadata view
+        +AICElementManifest[] elements
+        +AICRelationship[] relationships
+        +JsonObject user_context
+    }
 
-The intended production flow is:
+    class AICDiscoveryManifest {
+        +string spec
+        +string app name and version
+        +AICDiscoveryCapabilities capabilities
+        +AICDiscoveryEndpoints endpoints
+    }
 
-1. collect captures
-2. build a normalized prompt payload
-3. call a model provider outside the core library
-4. normalize suggestions back into an AIC review bundle and accepted draft subset for human review
+    class AICPermissionsManifest {
+        +Record riskBands
+        +string[] forbiddenActions
+        +Record actionPolicies
+    }
 
-The concrete reference implementations for step 3 now live in two places:
+    class AICWorkflowManifest {
+        +AICWorkflowDefinition[] workflows
+    }
 
-- `@aicorg/ai-bootstrap-http` for generic JSON POST providers
-- `@aicorg/ai-bootstrap-openai` for OpenAI Responses API integrations using Structured Outputs
+    class AICSemanticActionsManifest {
+        +AICActionContract[] actions
+    }
 
-The repo also now includes a runnable reference workflow in [examples/bootstrap-openai/README.md](/mnt/c/Users/vatsa/agentinteractioncontrol/examples/bootstrap-openai/README.md#L1), backed by a saved capture file and CLI artifact emission.
+    AICRuntimeUiManifest "1" --o "many" AICElementManifest
+    AICWorkflowManifest "1" --o "many" AICWorkflowDefinition
+    AICSemanticActionsManifest "1" --o "many" AICActionContract
+```
 
-The preferred CLI artifact flow is:
+---
 
-- `--prompt-file` for the provider prompt payload
-- `--review-file` for the full structured review bundle
-- `--draft-file` for the accepted manifest subset
-- `--report-file` for a concise human-readable review summary
+## Metadata Provenance Priority
 
-Review bundles keep accepted and filtered suggestions together, record deterministic issue codes such as duplicate targets and low-confidence filtering, and embed manifest-validation findings without failing generation by default.
+The `AICRegistry` merges element registrations from three sources. Higher priority wins on conflicts:
+
+```
+ai_suggested  (lowest — from bootstrap AI)
+    ↓
+inferred      (middle — computed from DOM/AST)
+    ↓
+authored      (highest — explicit agent* props by developer)
+```
+
+All sources are tracked in the `provenance` field on each element manifest.
+
+---
+
+## Risk Levels and Confirmation Protocol
+
+| Risk | Meaning | Typical Policy |
+|---|---|---|
+| `low` | Read-only or trivially reversible | No confirmation required |
+| `medium` | Standard mutation | Agent may proceed autonomously |
+| `high` | Significant irreversible change | Requires confirmation gate |
+| `critical` | Financial / destructive / compliance | Human review + prompt template required |
+
+**Risk flags** that further qualify risk: `financial`, `irreversible`, `external_side_effect`, `customer_visible`, `privacy_sensitive`, `destructive`, `compliance_relevant`
+
+---
+
+## Devtools — Development Bridge
+
+```mermaid
+flowchart LR
+    REG["AICRegistry (in-memory)"]
+    BRIDGE["AICDevtoolsBridge (React component)"]
+    EVENT["CustomEvent aic:devtools:snapshot (window dispatch, throttled 150ms)"]
+    EXT["Browser Extension / DevTools Panel (listener)"]
+    OVERLAY["AICDevtoolsOverlay (in-page inspector)"]
+
+    REG -->|subscribe| BRIDGE
+    BRIDGE -->|dispatchEvent| EVENT
+    EVENT -->|listen| EXT
+    REG -->|useAICInspectorSnapshot| OVERLAY
+```
+
+---
+
+## Project Config — `aic.project.json`
+
+```json
+{
+  "appName": "My App",
+  "framework": "vite",
+  "projectRoot": ".",
+  "viewId": "vite.root",
+  "viewUrl": "http://localhost:5173",
+  "hmr": true,
+  "notes": ["initialized by aic init"],
+  "permissions": {},
+  "workflows": []
+}
+```
+
+This single config file drives `aic generate project` to produce all 6+ manifest artifacts.
+
+---
+
+## Agent Onboarding File Checklist
+
+AIC scaffolds and tracks these files via `aic init` and `aic doctor`:
+
+| File | Kind | Purpose |
+|---|---|---|
+| `AGENTS.md` | canonical | Master AIC policy for all AI agents |
+| `CLAUDE.md` | wrapper | Claude Code wrapper pointing to AGENTS.md |
+| `GEMINI.md` | wrapper | Gemini wrapper pointing to AGENTS.md |
+| `.github/copilot-instructions.md` | copilot_instructions | GitHub Copilot AIC instructions |
+| `.cursor/rules/aic.mdc` | cursor_rule | Cursor IDE rule for AIC |
+| `aic.project.json` | project_config | Build-time configuration |
+
+---
+
+## Key Design Principles
+
+> [!IMPORTANT]
+> **Contract-first, not selector-first.** Agents use stable `agentId` values as the interaction contract, never DOM selectors or visible text.
+
+> [!TIP]
+> **Explicit over inferred.** The `authored` provenance source always wins. Add explicit `agent*` props rather than relying on DOM inference.
+
+> [!WARNING]
+> **Never hand-edit generated JSON.** All artifacts under `.well-known/` and `report.json` are generated — regenerate them with `aic generate project`.
