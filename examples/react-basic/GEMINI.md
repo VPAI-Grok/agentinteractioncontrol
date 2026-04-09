@@ -1,4 +1,4 @@
 <!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
 # Gemini Wrapper
 
-Read `AGENTS.md` first and follow it for AIC work in this example.
+Read [AGENTS.md](./AGENTS.md) first and follow it for AIC work in this example.

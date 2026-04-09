@@ -5,7 +5,7 @@ Use this skill when the task is to make a React, Next.js, or Vite app AIC-ready.
 
 ## Workflow
 
-1. Read `AGENTS.md`.
+1. Read [AGENTS.md](../../../AGENTS.md).
 2. Find the critical user flows and risky actions.
 3. Add explicit `agent*` metadata first.
 4. Add or update `aic.project.json`.

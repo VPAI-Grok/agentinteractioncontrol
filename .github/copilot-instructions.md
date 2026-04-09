@@ -1,7 +1,7 @@
 <!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
 # GitHub Copilot AIC Instructions
 
-Use [AGENTS.md](/mnt/c/users/vatsa/agentinteractioncontrol/AGENTS.md) as the canonical AIC instruction set for this repo.
+Use [AGENTS.md](../AGENTS.md) as the canonical AIC instruction set for this repo.
 
 When implementing AIC:
 

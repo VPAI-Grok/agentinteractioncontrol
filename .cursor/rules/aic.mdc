@@ -12,6 +12,6 @@ alwaysApply: false
 
 # AIC Cursor Rule
 
-For AIC work, follow [AGENTS.md](/mnt/c/users/vatsa/agentinteractioncontrol/AGENTS.md) as the canonical policy.
+For AIC work, follow [AGENTS.md](../../../AGENTS.md) as the canonical policy.
 
 Prefer explicit `agent*` annotations, stable IDs, and reviewed artifact generation over heuristics.
