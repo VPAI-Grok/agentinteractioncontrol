@@ -227,6 +227,7 @@ pnpm --dir examples/nextjs-checkout-demo run aic:doctor
 pnpm --dir examples/nextjs-checkout-demo run aic:generate
 pnpm --dir examples/react-basic run aic:doctor
 pnpm smoke:adoption
+pnpm smoke:mcp
 ```
 
 Outside this repo, use the published alpha CLI:

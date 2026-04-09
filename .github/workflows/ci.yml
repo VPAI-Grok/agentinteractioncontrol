@@ -37,6 +37,9 @@ jobs:
       - name: Smoke adoption flow
         run: pnpm smoke:adoption
 
+      - name: Smoke MCP flow
+        run: pnpm smoke:mcp
+
       - name: Verify golden artifacts
         run: pnpm test:goldens -- --actual-dir .artifacts/golden-review
 
