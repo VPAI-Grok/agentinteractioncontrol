@@ -278,6 +278,7 @@ Imagine hiring a new employee to use your software. Without documentation, they'
 | [supported-today.md](./docs/supported-today.md) | Implementation boundaries |
 | [threat-model.md](./docs/threat-model.md) | Security and trust model |
 | [implementation-phases.md](./docs/implementation-phases.md) | Roadmap phases |
+| [reference-consumer.test.mjs](./tests/reference-consumer.test.mjs) | End-to-end contract consumer reference test |
 
 JSON Schemas live under [`schemas/`](./schemas/).
 
