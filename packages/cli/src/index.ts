@@ -1041,6 +1041,12 @@ async function main(): Promise<void> {
     return;
   }
 
+  if (command === "help" || command === "--help" || command === "-h") {
+    printUsage();
+    process.exitCode = 0;
+    return;
+  }
+
   if (command === "scan" && kind) {
     process.exitCode = await scanPath(kind);
     return;

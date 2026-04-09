@@ -21,13 +21,13 @@
           "type": "element_action"
         }
       ],
+      "notes": [
+        "Extracted from src/App.tsx:41"
+      ],
       "risk": "low",
       "state": {
         "visible": true
-      },
-      "notes": [
-        "Extracted from src/App.tsx:41"
-      ]
+      }
     },
     {
       "id": "customer.actions.menu",
@@ -41,13 +41,13 @@
           "type": "element_action"
         }
       ],
+      "notes": [
+        "Extracted from src/App.tsx:49"
+      ],
       "risk": "low",
       "state": {
         "visible": true
-      },
-      "notes": [
-        "Extracted from src/App.tsx:49"
-      ]
+      }
     },
     {
       "id": "customer.archive",
@@ -61,13 +61,13 @@
           "type": "element_action"
         }
       ],
+      "notes": [
+        "Extracted from src/App.tsx:58"
+      ],
       "risk": "high",
       "state": {
         "visible": true
-      },
-      "notes": [
-        "Extracted from src/App.tsx:58"
-      ]
+      }
     },
     {
       "id": "customer.archive.dialog",
@@ -81,13 +81,13 @@
           "type": "element_action"
         }
       ],
+      "notes": [
+        "Extracted from src/App.tsx:67"
+      ],
       "risk": "medium",
       "state": {
         "visible": true
-      },
-      "notes": [
-        "Extracted from src/App.tsx:67"
-      ]
+      }
     },
     {
       "id": "customer.view",
@@ -101,13 +101,13 @@
           "type": "element_action"
         }
       ],
+      "notes": [
+        "Extracted from src/App.tsx:76"
+      ],
       "risk": "low",
       "state": {
         "visible": true
-      },
-      "notes": [
-        "Extracted from src/App.tsx:76"
-      ]
+      }
     }
   ]
 }

@@ -6,9 +6,7 @@ This is a demonstration of how to integrate the [@aicorg/sdk-react](https://www.
 
 This example proves that an AI agent using the standard MCP protocol can autonomously operate a Next.js web application utilizing AIC components, without brittle DOM selectors.
 
-Here is a recording of an autonomous browser agent completing the full checkout flow (applying a coupon, saving the cart, and submitting the order):
-
-![Next.js Checkout Agent E2E Validation](/C:/Users/vatsa/.gemini/antigravity/brain/26f18e3c-849e-46a7-a753-d0a5bbf996c4/nextjs_checkout_test_1775089024345.webp)
+Here is the repo's canonical Next.js AIC starter. It demonstrates generated manifests, MCP discovery, and a critical-action contract with structured confirmation.
 
 ## Getting Started
 
@@ -17,17 +15,22 @@ Here is a recording of an autonomous browser agent completing the full checkout 
    pnpm install
    ```
 
-2. Generate the static `/public/.well-known` AIC manifests using the CLI toolkit:
+2. Generate the AIC manifests using the local CLI toolkit:
    ```bash
-   npx aic generate project aic.project.json --out-dir ./public
+   pnpm run aic:generate
    ```
 
-3. Start the Next.js development server:
+3. Audit the example:
+   ```bash
+   pnpm run aic:doctor
+   ```
+
+4. Start the Next.js development server:
    ```bash
    pnpm run dev
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## Simulating the Agent Connection (MCP)
 
@@ -39,3 +42,12 @@ To verify the MCP Server integration against this Next.js app:
    node simulate-mcp-client.mjs
    ```
 3. The script connects to the AIC MCP Server over `stdio` and lists actionable elements extracted directly from the generated static files.
+
+## Useful Commands
+
+```bash
+pnpm aic --help
+pnpm run aic:doctor
+pnpm run aic:generate
+pnpm run aic:inspect
+```

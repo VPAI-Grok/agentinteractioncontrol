@@ -1,0 +1,11 @@
+---
+description: AIC implementation guidance for the checkout example
+globs:
+  - "app/**"
+alwaysApply: false
+---
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+
+# AIC Cursor Rule
+
+Follow `AGENTS.md` as the canonical AIC policy for this example.

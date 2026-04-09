@@ -13,6 +13,8 @@
   },
   "packageManager": "pnpm@10.8.1",
   "scripts": {
+    "aic": "node ./packages/cli/dist/cli/src/index.js",
+    "benchmark:summary:adoption": "node scripts/summarize-adoption-benchmark.mjs",
     "build": "pnpm -r --if-present build",
     "check": "pnpm -r --if-present check",
     "changeset": "changeset",

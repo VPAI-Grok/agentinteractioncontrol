@@ -75,6 +75,7 @@ export interface AICFileScanResult {
   diagnostics: AICExtractionDiagnostic[];
   file: string;
   matches: AICSourceScanMatch[];
+  records?: ParsedJsxElementRecord[];
   source_inventory: AICAuthoringSourceInventoryEntry[];
 }
 
@@ -82,6 +83,7 @@ export interface AICProjectScanResult {
   diagnostics: AICExtractionDiagnostic[];
   files: string[];
   matches: AICSourceScanMatch[];
+  records?: ParsedJsxElementRecord[];
   source_inventory: AICAuthoringSourceInventoryEntry[];
 }
 
@@ -857,14 +859,23 @@ interface ParsedJsxElementRecord {
   agentId?: string;
   attributes: Map<string, ts.JsxAttribute>;
   column: number;
+  confirmation?: AICElementManifest["confirmation"];
   diagnostics: AICExtractionDiagnostic[];
   duplicateAicProps: string[];
+  effects?: AICElementManifest["effects"];
+  entity_ref?: AICElementManifest["entity_ref"];
+  examples?: AICElementManifest["examples"];
+  execution?: AICElementManifest["execution"];
   file: string;
   hasSpreadAttributes: boolean;
   label?: string;
   line: number;
   node: ts.JsxOpeningElement | ts.JsxSelfClosingElement;
+  notes?: AICElementManifest["notes"];
   opening_tag_signature: string;
+  permissions?: AICElementManifest["permissions"];
+  recovery?: AICElementManifest["recovery"];
+  requires_confirmation?: AICElementManifest["requires_confirmation"];
   risk?: string;
   role: AICRole;
   selectors: {
@@ -873,13 +884,17 @@ interface ParsedJsxElementRecord {
   };
   sourceFile: ts.SourceFile;
   source_key: string;
+  state?: AICElementManifest["state"];
   tagName: string;
   unsupportedAicProps: string[];
+  validation?: AICElementManifest["validation"];
+  workflow_ref?: AICElementManifest["workflow_ref"];
 }
 
 interface ParsedSourceAnalysis {
   diagnostics: AICExtractionDiagnostic[];
   matches: AICSourceScanMatch[];
+  records: ParsedJsxElementRecord[];
   source_inventory: AICAuthoringSourceInventoryEntry[];
 }
 
@@ -891,6 +906,18 @@ interface ApplyParsedFile {
 }
 
 type StaticValue =
+  | {
+      kind: "array";
+      values: StaticValue[];
+    }
+  | {
+      kind: "boolean";
+      value: boolean;
+    }
+  | {
+      kind: "number";
+      value: number;
+    }
   | {
       kind: "object";
       properties: Map<string, StaticValue>;
@@ -957,14 +984,28 @@ const MUTABLE_STRING_AIC_PROP_NAMES = [
   "agentWorkflowStep"
 ] as const;
 const MUTABLE_BOOLEAN_AIC_PROP_NAMES = ["agentRequiresConfirmation"] as const;
+const STATIC_AIC_PROP_NAMES = [
+  "agentAliases",
+  "agentConfirmation",
+  "agentEffects",
+  "agentExamples",
+  "agentExecution",
+  "agentNotes",
+  "agentPermissions",
+  "agentRecovery",
+  "agentValidation",
+  "state"
+] as const;
 const MUTABLE_AIC_PROP_NAMES = new Set<string>([
   ...MUTABLE_STRING_AIC_PROP_NAMES,
-  ...MUTABLE_BOOLEAN_AIC_PROP_NAMES
+  ...MUTABLE_BOOLEAN_AIC_PROP_NAMES,
+  ...STATIC_AIC_PROP_NAMES
 ]);
 
 type MutableStringAicPropName = (typeof MUTABLE_STRING_AIC_PROP_NAMES)[number];
 type MutableBooleanAicPropName = (typeof MUTABLE_BOOLEAN_AIC_PROP_NAMES)[number];
-type MutableAicPropName = MutableBooleanAicPropName | MutableStringAicPropName;
+type StaticAicPropName = (typeof STATIC_AIC_PROP_NAMES)[number];
+type MutableAicPropName = MutableBooleanAicPropName | MutableStringAicPropName | StaticAicPropName;
 type DesiredMutableAicProps = Partial<Record<MutableAicPropName, string | boolean>>;
 
 function isConstVariableDeclaration(node: ts.VariableDeclaration): boolean {
@@ -1010,6 +1051,14 @@ function readLiteralString(node: ts.Expression | undefined): string | undefined 
   }
 
   return undefined;
+}
+
+function isBooleanLiteralExpression(node: ts.Expression | undefined): node is ts.BooleanLiteral {
+  if (!node) {
+    return false;
+  }
+
+  return node.kind === ts.SyntaxKind.TrueKeyword || node.kind === ts.SyntaxKind.FalseKeyword;
 }
 
 function unwrapStaticExpression(expression: ts.Expression): ts.Expression {
@@ -1194,6 +1243,26 @@ function resolveStaticValue(
     };
   }
 
+  if (isBooleanLiteralExpression(currentExpression)) {
+    return {
+      ok: true,
+      value: {
+        kind: "boolean",
+        value: currentExpression.kind === ts.SyntaxKind.TrueKeyword
+      }
+    };
+  }
+
+  if (ts.isNumericLiteral(currentExpression)) {
+    return {
+      ok: true,
+      value: {
+        kind: "number",
+        value: Number(currentExpression.text)
+      }
+    };
+  }
+
   if (ts.isIdentifier(currentExpression)) {
     const identifier = currentExpression.text;
 
@@ -1278,6 +1347,35 @@ function resolveStaticValue(
       value: {
         kind: "object",
         properties
+      }
+    };
+  }
+
+  if (ts.isArrayLiteralExpression(currentExpression)) {
+    const values: StaticValue[] = [];
+
+    for (const element of currentExpression.elements) {
+      if (ts.isSpreadElement(element)) {
+        return createStaticResolutionError(
+          "unsupported_expression",
+          element,
+          `${contextLabel} uses an unsupported array spread. Use plain same-file array literals only.`
+        );
+      }
+
+      const resolvedElement = resolveStaticValue(element, resolver, contextLabel, state);
+      if (!resolvedElement.ok) {
+        return resolvedElement;
+      }
+
+      values.push(resolvedElement.value);
+    }
+
+    return {
+      ok: true,
+      value: {
+        kind: "array",
+        values
       }
     };
   }
@@ -1431,6 +1529,21 @@ function resolveStaticStringExpression(
   };
 }
 
+function staticValueToRuntimeValue(value: StaticValue): unknown {
+  switch (value.kind) {
+    case "string":
+    case "boolean":
+    case "number":
+      return value.value;
+    case "array":
+      return value.values.map((entry) => staticValueToRuntimeValue(entry));
+    case "object":
+      return Object.fromEntries(
+        Array.from(value.properties.entries()).map(([key, entry]) => [key, staticValueToRuntimeValue(entry)])
+      );
+  }
+}
+
 function pushStaticResolutionDiagnostic(
   sourceFile: ts.SourceFile,
   file: string,
@@ -1576,6 +1689,7 @@ function readElementLabel(
   diagnostics: AICExtractionDiagnostic[]
 ): string | undefined {
   const attributeLabel =
+    attributeMap.get("agentLabel") ??
     attributeMap.get("aria-label") ??
     attributeMap.get("title") ??
     attributeMap.get("value") ??
@@ -1778,6 +1892,64 @@ function buildAttributeInventory(
   };
 }
 
+function readJsxAttributeStaticValue(
+  attribute: ts.JsxAttribute,
+  sourceFile: ts.SourceFile,
+  file: string,
+  staticResolver: StaticValueResolverContext,
+  diagnostics: AICExtractionDiagnostic[]
+): unknown | undefined {
+  if (!attribute.initializer) {
+    return true;
+  }
+
+  if (ts.isStringLiteral(attribute.initializer)) {
+    return attribute.initializer.text;
+  }
+
+  if (!ts.isJsxExpression(attribute.initializer) || !attribute.initializer.expression) {
+    diagnostics.push(
+      createDiagnostic(
+        sourceFile,
+        file,
+        attribute,
+        "warning",
+        "unsupported_expression",
+        `${readJsxAttributeName(attribute)} uses an unsupported expression. Use a same-file deterministic literal or object.`,
+        readJsxAttributeName(attribute)
+      )
+    );
+    return undefined;
+  }
+
+  const resolution = resolveStaticValue(
+    attribute.initializer.expression,
+    staticResolver,
+    readJsxAttributeName(attribute),
+    {
+      depth: 0,
+      seen: new Set<string>()
+    }
+  );
+
+  if (!resolution.ok) {
+    diagnostics.push(
+      createDiagnostic(
+        sourceFile,
+        file,
+        resolution.error.node,
+        "warning",
+        resolution.error.code,
+        resolution.error.message,
+        readJsxAttributeName(attribute)
+      )
+    );
+    return undefined;
+  }
+
+  return staticValueToRuntimeValue(resolution.value);
+}
+
 function readMutableAicAttributeValue(
   attributeName: MutableAicPropName,
   attribute: ts.JsxAttribute,
@@ -1788,6 +1960,13 @@ function readMutableAicAttributeValue(
 ): string | boolean | undefined {
   if (attributeName === "agentRequiresConfirmation") {
     return readJsxBooleanAttributeValue(attribute, sourceFile, file, diagnostics);
+  }
+
+  if ((STATIC_AIC_PROP_NAMES as readonly string[]).includes(attributeName)) {
+    return readJsxAttributeStaticValue(attribute, sourceFile, file, staticResolver, diagnostics) as
+      | string
+      | boolean
+      | undefined;
   }
 
   return readJsxAttributeValue(attribute, sourceFile, file, staticResolver, diagnostics);
@@ -1836,25 +2015,37 @@ function humanizeAgentId(agentId: string): string {
   return agentId.split(".").at(-1)?.replaceAll("_", " ") ?? agentId;
 }
 
-function createElements(matches: AICSourceScanMatch[]): AICElementManifest[] {
-  return matches.map((match) => ({
-    id: match.agentId,
-    label: match.agentDescription ?? humanizeAgentId(match.agentId),
-    description: match.agentDescription,
-    role: match.role,
-    actions: [
-      {
-        name: match.action ?? "click",
-        target: match.agentId,
-        type: "element_action"
-      }
-    ],
-    risk: normalizeRisk(match.risk),
-    state: {
-      visible: true
-    },
-    notes: [`Extracted from ${match.file}:${match.line}`]
-  }));
+function createElements(records: ParsedJsxElementRecord[]): AICElementManifest[] {
+  return records
+    .filter((record): record is ParsedJsxElementRecord & { agentId: string } => Boolean(record.agentId))
+    .map((record) => ({
+      id: record.agentId,
+      label: record.agentDescription ?? humanizeAgentId(record.agentId),
+      description: record.agentDescription,
+      role: record.role,
+      actions: [
+        {
+          name: record.action ?? "click",
+          target: record.agentId,
+          type: "element_action"
+        }
+      ],
+      confirmation: record.confirmation,
+      effects: record.effects,
+      entity_ref: record.entity_ref,
+      examples: record.examples,
+      execution: record.execution,
+      notes: [...(record.notes ?? []), `Extracted from ${record.file}:${record.line}`],
+      permissions: record.permissions,
+      recovery: record.recovery,
+      requires_confirmation: record.requires_confirmation,
+      risk: normalizeRisk(record.risk),
+      state: record.state ?? {
+        visible: true
+      },
+      validation: record.validation,
+      workflow_ref: record.workflow_ref
+    }));
 }
 
 function createActionContracts(matches: AICSourceScanMatch[]): AICActionContract[] {
@@ -1979,6 +2170,140 @@ function parseSourceAnalysis(source: string, file: string): ParsedSourceAnalysis
           undefined,
         text: label
       };
+      const confirmation = attributeMap.get("agentConfirmation")
+        ? (readJsxAttributeStaticValue(
+            attributeMap.get("agentConfirmation") as ts.JsxAttribute,
+            sourceFile,
+            file,
+            staticResolver,
+            diagnostics
+          ) as AICElementManifest["confirmation"])
+        : undefined;
+      const effects = attributeMap.get("agentEffects")
+        ? (readJsxAttributeStaticValue(
+            attributeMap.get("agentEffects") as ts.JsxAttribute,
+            sourceFile,
+            file,
+            staticResolver,
+            diagnostics
+          ) as AICElementManifest["effects"])
+        : undefined;
+      const examples = attributeMap.get("agentExamples")
+        ? (readJsxAttributeStaticValue(
+            attributeMap.get("agentExamples") as ts.JsxAttribute,
+            sourceFile,
+            file,
+            staticResolver,
+            diagnostics
+          ) as AICElementManifest["examples"])
+        : undefined;
+      const execution = attributeMap.get("agentExecution")
+        ? (readJsxAttributeStaticValue(
+            attributeMap.get("agentExecution") as ts.JsxAttribute,
+            sourceFile,
+            file,
+            staticResolver,
+            diagnostics
+          ) as AICElementManifest["execution"])
+        : undefined;
+      const notes = attributeMap.get("agentNotes")
+        ? (readJsxAttributeStaticValue(
+            attributeMap.get("agentNotes") as ts.JsxAttribute,
+            sourceFile,
+            file,
+            staticResolver,
+            diagnostics
+          ) as AICElementManifest["notes"])
+        : undefined;
+      const permissions = attributeMap.get("agentPermissions")
+        ? (readJsxAttributeStaticValue(
+            attributeMap.get("agentPermissions") as ts.JsxAttribute,
+            sourceFile,
+            file,
+            staticResolver,
+            diagnostics
+          ) as AICElementManifest["permissions"])
+        : undefined;
+      const recovery = attributeMap.get("agentRecovery")
+        ? (readJsxAttributeStaticValue(
+            attributeMap.get("agentRecovery") as ts.JsxAttribute,
+            sourceFile,
+            file,
+            staticResolver,
+            diagnostics
+          ) as AICElementManifest["recovery"])
+        : undefined;
+      const requires_confirmation = attributeMap.get("agentRequiresConfirmation")
+        ? (readJsxAttributeStaticValue(
+            attributeMap.get("agentRequiresConfirmation") as ts.JsxAttribute,
+            sourceFile,
+            file,
+            staticResolver,
+            diagnostics
+          ) as boolean | undefined)
+        : undefined;
+      const state = attributeMap.get("state")
+        ? (readJsxAttributeStaticValue(
+            attributeMap.get("state") as ts.JsxAttribute,
+            sourceFile,
+            file,
+            staticResolver,
+            diagnostics
+          ) as AICElementManifest["state"])
+        : undefined;
+      const validation = attributeMap.get("agentValidation")
+        ? (readJsxAttributeStaticValue(
+            attributeMap.get("agentValidation") as ts.JsxAttribute,
+            sourceFile,
+            file,
+            staticResolver,
+            diagnostics
+          ) as AICElementManifest["validation"])
+        : undefined;
+      const workflow_ref = attributeMap.get("agentWorkflowStep")
+        ? readJsxAttributeValue(
+            attributeMap.get("agentWorkflowStep") as ts.JsxAttribute,
+            sourceFile,
+            file,
+            staticResolver,
+            diagnostics
+          )
+        : undefined;
+      const entityId = attributeMap.get("agentEntityId")
+        ? readJsxAttributeValue(
+            attributeMap.get("agentEntityId") as ts.JsxAttribute,
+            sourceFile,
+            file,
+            staticResolver,
+            diagnostics
+          )
+        : undefined;
+      const entityType = attributeMap.get("agentEntityType")
+        ? readJsxAttributeValue(
+            attributeMap.get("agentEntityType") as ts.JsxAttribute,
+            sourceFile,
+            file,
+            staticResolver,
+            diagnostics
+          )
+        : undefined;
+      const entityLabel = attributeMap.get("agentEntityLabel")
+        ? readJsxAttributeValue(
+            attributeMap.get("agentEntityLabel") as ts.JsxAttribute,
+            sourceFile,
+            file,
+            staticResolver,
+            diagnostics
+          )
+        : undefined;
+      const entity_ref =
+        entityId && entityType
+          ? {
+              entity_id: entityId,
+              entity_label: entityLabel,
+              entity_type: entityType
+            }
+          : undefined;
 
       if (agentId || (label && isSourceInventoryCandidate(tagName, explicitRole))) {
         records.push({
@@ -1987,21 +2312,33 @@ function parseSourceAnalysis(source: string, file: string): ParsedSourceAnalysis
           agentId,
           attributes: attributeMap,
           column: location.column,
+          confirmation,
           diagnostics,
           duplicateAicProps: attributeInventory.duplicateAicProps,
+          effects,
+          entity_ref,
+          examples,
+          execution,
           file,
           hasSpreadAttributes: attributeInventory.hasSpreadAttributes,
           label,
           line: location.line,
           node,
+          notes,
           opening_tag_signature,
+          permissions,
+          recovery,
+          requires_confirmation,
           risk,
           role,
           selectors,
           sourceFile,
           source_key,
+          state,
           tagName,
-          unsupportedAicProps
+          unsupportedAicProps,
+          validation,
+          workflow_ref
         });
       }
     }
@@ -2026,6 +2363,7 @@ function parseSourceAnalysis(source: string, file: string): ParsedSourceAnalysis
         source_key: record.source_key,
         tagName: record.tagName
       })),
+    records,
     source_inventory: records.map((record) => ({
       annotated_agent_id: record.agentId,
       column: record.column,
@@ -2151,6 +2489,7 @@ export function scanSourceForAICAnnotations(source: string, file = "<memory>"): 
     diagnostics: parsed.diagnostics,
     file,
     matches: parsed.matches,
+    records: parsed.records,
     source_inventory: parsed.source_inventory
   };
 }
@@ -2169,6 +2508,7 @@ export async function analyzeProjectForAICAnnotations(projectRoot: string): Prom
     diagnostics: fileResults.flatMap((result) => result.diagnostics),
     files: fileResults.map((result) => result.file),
     matches: fileResults.flatMap((result) => result.matches),
+    records: fileResults.flatMap((result) => result.records ?? []),
     source_inventory: fileResults.flatMap((result) => result.source_inventory)
   };
 }
@@ -2179,7 +2519,7 @@ export async function generateProjectArtifacts(
   const registry = new AICRegistry();
   const scanResult = options.projectRoot
     ? await analyzeProjectForAICAnnotations(options.projectRoot)
-    : { diagnostics: [], files: [], matches: [], source_inventory: [] };
+    : { diagnostics: [], files: [], matches: [], records: [], source_inventory: [] };
   const timestamp = options.generatedAt ?? new Date().toISOString();
   const updatedAt = options.updatedAt ?? timestamp;
   const discovery = registry.createDiscoveryManifest({
@@ -2208,7 +2548,7 @@ export async function generateProjectArtifacts(
     view: {
       view_id: options.viewId ?? `${options.framework}.root`
     },
-    elements: createElements(scanResult.matches)
+    elements: createElements(scanResult.records ?? [])
   };
   const actions: AICSemanticActionsManifest = {
     spec: discovery.spec,

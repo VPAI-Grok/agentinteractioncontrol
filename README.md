@@ -199,6 +199,8 @@ const { attributes } = useAICElement({
 
 | I want to… | Go here |
 |------------|---------|
+| 🚀 Try AIC in 15 minutes | [Next.js Checkout Example](./examples/nextjs-checkout-demo) |
+| 🚀 Try AIC in 15 minutes with Vite | [Vite CRM Example](./examples/react-basic) |
 | 🤖 Connect Claude Desktop or Cursor | [MCP Server Setup](./docs/mcp-server.md) |
 | ⚛️ Instrument a React/Next.js app | [Next.js Checkout Example](./examples/nextjs-checkout-demo) |
 | ⚡ Instrument a Vite/React app | [Vite CRM Example](./examples/react-basic) |
@@ -215,17 +217,42 @@ const { attributes } = useAICElement({
 
 ---
 
+## ⚡ 15-Minute Adoption
+
+Inside this repo, use the local CLI wrapper:
+
+```bash
+pnpm aic --help
+pnpm --dir examples/nextjs-checkout-demo run aic:doctor
+pnpm --dir examples/nextjs-checkout-demo run aic:generate
+pnpm --dir examples/react-basic run aic:doctor
+```
+
+Outside this repo, use the published alpha CLI:
+
+```bash
+npx @aicorg/cli@alpha init ./my-app
+npx @aicorg/cli@alpha doctor ./my-app
+npx @aicorg/cli@alpha generate project ./my-app/aic.project.json --out-dir ./my-app/public
+```
+
+When those commands pass, you have the minimum AIC adoption loop working:
+- instrumentation in source
+- onboarding files for coding agents
+- generated discovery/UI/permissions/workflow artifacts
+- a doctor report with no blocking errors
+
 ## 🔄 The Three Workflows
 
 ### 🤖 Automation — generate manifests from your annotated source
 
 ```bash
-aic init ./my-app                         # scaffold config + onboarding files
-aic doctor ./my-app                       # audit coverage gaps before generating
-aic scan ./my-app/src                     # preview what was extracted
-aic generate project aic.project.json \  # emit all manifests
+pnpm aic init ./my-app                    # scaffold config + onboarding files
+pnpm aic doctor ./my-app                  # audit coverage gaps before generating
+pnpm aic scan ./my-app/src                # preview what was extracted
+pnpm aic generate project aic.project.json \  # emit all manifests
   --out-dir ./public
-aic diff ui before.json after.json        # review changes before committing
+pnpm aic diff ui before.json after.json   # review changes before committing
 ```
 
 ### 🪄 Bootstrap — let AI suggest annotations for you
@@ -235,7 +262,7 @@ aic diff ui before.json after.json        # review changes before committing
 # Feed captures to a model (OpenAI, any HTTP provider)
 # Get back reviewed, human-approved annotation suggestions
 
-aic bootstrap <url> \
+pnpm aic bootstrap <url> \
   --captures-file captures.json \
   --suggestions-file suggestions.json \
   --provider-kind openai \
@@ -249,7 +276,7 @@ aic bootstrap <url> \
 1. Mount `AICDevtoolsBridge` next to `AICProvider` in dev
 2. Use `AICDevtoolsOverlay` for quick visual checks
 3. Open the browser DevTools panel for full filtering, diffing, and patch-plan export
-4. Run `aic apply authoring-plan <plan.json> --project-root ./app --write` to commit edits
+4. Run `pnpm aic apply authoring-plan <plan.json> --project-root ./app --write` to commit edits
 
 ---
 
@@ -356,8 +383,8 @@ This repo ships onboarding templates for all major coding agents:
 | All agents (canonical) | [AGENTS.md](./AGENTS.md) |
 
 ```bash
-aic init [project-root]    # scaffold aic.project.json + onboarding files
-aic doctor [project-root]  # audit config, coverage, diagnostics — no mutations
+pnpm aic init [project-root]    # scaffold aic.project.json + onboarding files
+pnpm aic doctor [project-root]  # audit config, coverage, diagnostics — no mutations
 ```
 
 ---

@@ -4,6 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "aic:doctor": "node ../../packages/cli/dist/cli/src/index.js doctor .",
+    "aic:generate": "node ../../packages/cli/dist/cli/src/index.js generate project aic.project.json --out-dir ./public",
+    "aic:inspect": "node ../../packages/cli/dist/cli/src/index.js inspect ./public/report.json",
     "dev": "vite",
     "build": "tsc -p tsconfig.json --noEmit && vite build",
     "check": "tsc -p tsconfig.json --noEmit"

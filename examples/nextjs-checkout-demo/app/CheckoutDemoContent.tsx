@@ -86,6 +86,7 @@ export function CheckoutDemoContent() {
         <AICForm
           agentDescription="Reviews and applies coupon codes before the order is submitted"
           agentId="checkout.discount_form"
+          agentLabel="Discounts form"
           agentRisk="low"
           agentWorkflowStep="checkout.review.discount"
           style={{ display: "grid", gap: 12 }}

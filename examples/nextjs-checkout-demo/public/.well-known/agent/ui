@@ -21,13 +21,14 @@
           "type": "element_action"
         }
       ],
+      "notes": [
+        "Extracted from app/CheckoutDemoContent.tsx:86"
+      ],
       "risk": "low",
       "state": {
         "visible": true
       },
-      "notes": [
-        "Extracted from app/CheckoutDemoContent.tsx:86"
-      ]
+      "workflow_ref": "checkout.review.discount"
     },
     {
       "id": "checkout.coupon_code",
@@ -41,13 +42,24 @@
           "type": "element_action"
         }
       ],
+      "notes": [
+        "Extracted from app/ContractProof.tsx:6"
+      ],
       "risk": "low",
       "state": {
         "visible": true
       },
-      "notes": [
-        "Extracted from app/ContractProof.tsx:6"
-      ]
+      "validation": {
+        "examples": [
+          "SPRING20",
+          "SHIPFREE"
+        ],
+        "format": "uppercase_code",
+        "max_length": 16,
+        "min_length": 5,
+        "pattern": "^[A-Z0-9]+$"
+      },
+      "workflow_ref": "checkout.review.discount"
     },
     {
       "id": "checkout.apply_coupon",
@@ -61,13 +73,23 @@
           "type": "element_action"
         }
       ],
+      "effects": [
+        "order.discount.recalculated = true"
+      ],
+      "execution": {
+        "estimated_latency_ms": 1200,
+        "settled_when": [
+          "summary.discount.updated = true"
+        ]
+      },
+      "notes": [
+        "Extracted from app/ContractProof.tsx:20"
+      ],
       "risk": "low",
       "state": {
         "visible": true
       },
-      "notes": [
-        "Extracted from app/ContractProof.tsx:12"
-      ]
+      "workflow_ref": "checkout.review.discount"
     },
     {
       "id": "checkout.save_cart",
@@ -81,13 +103,30 @@
           "type": "element_action"
         }
       ],
+      "effects": [
+        "cart.snapshot_saved",
+        "toast.visible"
+      ],
+      "execution": {
+        "estimated_latency_ms": 1800,
+        "settled_when": [
+          "toast.visible = true"
+        ]
+      },
+      "notes": [
+        "Extracted from app/ContractProof.tsx:35"
+      ],
+      "recovery": {
+        "error_code": "cart_save_timeout",
+        "recovery": "retry_save_cart",
+        "retry_after_ms": 3000,
+        "retryable": true
+      },
       "risk": "medium",
       "state": {
         "visible": true
       },
-      "notes": [
-        "Extracted from app/ContractProof.tsx:20"
-      ]
+      "workflow_ref": "checkout.review.save"
     },
     {
       "id": "checkout.submit_order",
@@ -101,13 +140,38 @@
           "type": "element_action"
         }
       ],
+      "confirmation": {
+        "prompt_template": "Charge {{payment_method}} for {{order_total}} and submit order {{order_id}}?",
+        "summary_fields": [
+          "order_total",
+          "payment_method"
+        ],
+        "type": "human_review"
+      },
+      "effects": [
+        "payment.charge",
+        "order.status=submitted"
+      ],
+      "entity_ref": {
+        "entity_id": "ord_100245",
+        "entity_label": "Order #100245",
+        "entity_type": "order"
+      },
+      "execution": {
+        "estimated_latency_ms": 4000,
+        "settled_when": [
+          "navigation.pathname = '/checkout/success'"
+        ]
+      },
+      "notes": [
+        "Extracted from app/ContractProof.tsx:56"
+      ],
+      "requires_confirmation": true,
       "risk": "critical",
       "state": {
         "visible": true
       },
-      "notes": [
-        "Extracted from app/ContractProof.tsx:28"
-      ]
+      "workflow_ref": "checkout.review.submit"
     },
     {
       "id": "checkout.order_line.remove.line_starter_kit",
@@ -121,13 +185,23 @@
           "type": "element_action"
         }
       ],
+      "effects": [
+        "order.lines -= 1",
+        "order.total.recalculated = true"
+      ],
+      "entity_ref": {
+        "entity_id": "line_starter_kit",
+        "entity_label": "Starter Kit",
+        "entity_type": "order_line"
+      },
+      "notes": [
+        "Extracted from app/ContractProof.tsx:80"
+      ],
       "risk": "medium",
       "state": {
         "visible": true
       },
-      "notes": [
-        "Extracted from app/ContractProof.tsx:36"
-      ]
+      "workflow_ref": "checkout.review.items"
     }
   ]
 }
