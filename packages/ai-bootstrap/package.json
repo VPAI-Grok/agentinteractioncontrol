@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/ai-bootstrap",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "type": "module",
   "description": "Bootstrap prompt and review tooling for generating AIC drafts from captured pages.",
   "license": "Apache-2.0",
@@ -12,10 +12,17 @@
   "bugs": {
     "url": "https://github.com/VPAI-Grok/AIC/issues"
   },
-  "keywords": ["aic", "agents", "bootstrap", "playwright"],
+  "keywords": [
+    "aic",
+    "agents",
+    "bootstrap",
+    "playwright"
+  ],
   "main": "./dist/ai-bootstrap/src/index.js",
   "types": "./dist/ai-bootstrap/src/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/ai-bootstrap/src/index.d.ts",

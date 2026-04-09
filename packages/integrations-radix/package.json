@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/integrations-radix",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "type": "module",
   "description": "Radix UI helper factories for attaching AIC metadata.",
   "license": "Apache-2.0",
@@ -12,10 +12,17 @@
   "bugs": {
     "url": "https://github.com/VPAI-Grok/AIC/issues"
   },
-  "keywords": ["aic", "agents", "radix-ui", "react"],
+  "keywords": [
+    "aic",
+    "agents",
+    "radix-ui",
+    "react"
+  ],
   "main": "./dist/integrations-radix/src/index.js",
   "types": "./dist/integrations-radix/src/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/integrations-radix/src/index.d.ts",

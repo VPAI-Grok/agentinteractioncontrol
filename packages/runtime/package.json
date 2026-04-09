@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/runtime",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "type": "module",
   "description": "Runtime registry and manifest serialization helpers for AIC-enabled apps.",
   "license": "Apache-2.0",
@@ -12,10 +12,17 @@
   "bugs": {
     "url": "https://github.com/VPAI-Grok/AIC/issues"
   },
-  "keywords": ["aic", "agents", "runtime", "registry"],
+  "keywords": [
+    "aic",
+    "agents",
+    "runtime",
+    "registry"
+  ],
   "main": "./dist/runtime/src/index.js",
   "types": "./dist/runtime/src/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/runtime/src/index.d.ts",

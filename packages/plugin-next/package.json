@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/plugin-next",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "type": "module",
   "description": "Next.js project scanning and artifact generation helpers for AIC.",
   "license": "Apache-2.0",
@@ -12,10 +12,17 @@
   "bugs": {
     "url": "https://github.com/VPAI-Grok/AIC/issues"
   },
-  "keywords": ["aic", "agents", "nextjs", "plugin"],
+  "keywords": [
+    "aic",
+    "agents",
+    "nextjs",
+    "plugin"
+  ],
   "main": "./dist/plugin-next/src/index.js",
   "types": "./dist/plugin-next/src/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/plugin-next/src/index.d.ts",

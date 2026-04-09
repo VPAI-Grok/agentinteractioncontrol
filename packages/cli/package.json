@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/cli",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "type": "module",
   "description": "CLI for scanning, generating, bootstrapping, and inspecting AIC artifacts.",
   "license": "Apache-2.0",
@@ -12,10 +12,17 @@
   "bugs": {
     "url": "https://github.com/VPAI-Grok/AIC/issues"
   },
-  "keywords": ["aic", "agents", "cli", "tooling"],
+  "keywords": [
+    "aic",
+    "agents",
+    "cli",
+    "tooling"
+  ],
   "main": "./dist/cli/src/index.js",
   "types": "./dist/cli/src/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "bin": {
     "aic": "./dist/cli/src/index.js"
   },

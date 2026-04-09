@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/mcp-server",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "type": "module",
   "description": "MCP server that exposes AIC manifests to AI agents for reliable web app operation.",
   "license": "Apache-2.0",
@@ -12,13 +12,21 @@
   "bugs": {
     "url": "https://github.com/VPAI-Grok/AIC/issues"
   },
-  "keywords": ["aic", "agents", "mcp", "model-context-protocol", "manifests"],
+  "keywords": [
+    "aic",
+    "agents",
+    "mcp",
+    "model-context-protocol",
+    "manifests"
+  ],
   "bin": {
     "aic-mcp-server": "./dist/mcp-server/src/index.js"
   },
   "main": "./dist/mcp-server/src/index.js",
   "types": "./dist/mcp-server/src/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/mcp-server/src/index.d.ts",

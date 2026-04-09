@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/integrations-shadcn",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "type": "module",
   "description": "shadcn/ui wrapper components for attaching AIC metadata.",
   "license": "Apache-2.0",
@@ -12,10 +12,17 @@
   "bugs": {
     "url": "https://github.com/VPAI-Grok/AIC/issues"
   },
-  "keywords": ["aic", "agents", "shadcn", "react"],
+  "keywords": [
+    "aic",
+    "agents",
+    "shadcn",
+    "react"
+  ],
   "main": "./dist/integrations-shadcn/src/index.js",
   "types": "./dist/integrations-shadcn/src/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/integrations-shadcn/src/index.d.ts",

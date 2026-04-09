@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/automation-core",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "type": "module",
   "description": "Deterministic scanning, artifact generation, and onboarding helpers for AIC.",
   "license": "Apache-2.0",
@@ -12,10 +12,17 @@
   "bugs": {
     "url": "https://github.com/VPAI-Grok/AIC/issues"
   },
-  "keywords": ["aic", "agents", "automation", "scanning"],
+  "keywords": [
+    "aic",
+    "agents",
+    "automation",
+    "scanning"
+  ],
   "main": "./dist/automation-core/src/index.js",
   "types": "./dist/automation-core/src/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/automation-core/src/index.d.ts",

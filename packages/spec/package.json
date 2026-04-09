@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/spec",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "type": "module",
   "description": "Core AIC manifest types, validators, and diff helpers.",
   "license": "Apache-2.0",
@@ -12,10 +12,17 @@
   "bugs": {
     "url": "https://github.com/VPAI-Grok/AIC/issues"
   },
-  "keywords": ["aic", "agents", "contracts", "manifests"],
+  "keywords": [
+    "aic",
+    "agents",
+    "contracts",
+    "manifests"
+  ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

@@ -94,6 +94,10 @@ const deferredPrivatePackages = [
   "examples/react-basic/package.json"
 ];
 
+function assertAlphaVersion(version) {
+  assert.match(version, /^0\.1\.0-alpha\.\d+$/);
+}
+
 function runCommand(command, args, options = {}) {
   const { cwd = process.cwd(), env = {} } = options;
 
@@ -168,7 +172,7 @@ test("publish wave package manifests are public and alpha-versioned", async () =
     const packageJson = JSON.parse(await readFile(resolveFromRepo(pkg.path, "package.json"), "utf8"));
 
     assert.equal(packageJson.private, undefined);
-    assert.equal(packageJson.version, "0.1.0-alpha.0");
+    assertAlphaVersion(packageJson.version);
     assert.equal(packageJson.publishConfig?.access, "public");
     assert.deepEqual(packageJson.files, ["dist"]);
     assert.equal(typeof packageJson.description, "string");
@@ -208,7 +212,7 @@ test("packed npm tarballs rewrite workspace dependencies and only ship built fil
     const members = await listTarMembers(tarballPath);
 
     assert.equal(packedManifest.private, undefined);
-    assert.equal(packedManifest.version, "0.1.0-alpha.0");
+    assertAlphaVersion(packedManifest.version);
     assert.ok(members.some((member) => member.startsWith("package/dist/")));
     assert.equal(members.some((member) => member.startsWith("package/src/")), false);
 

@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/ai-bootstrap-http",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "type": "module",
   "description": "Generic HTTP provider adapter for AIC bootstrap suggestions.",
   "license": "Apache-2.0",
@@ -12,10 +12,17 @@
   "bugs": {
     "url": "https://github.com/VPAI-Grok/AIC/issues"
   },
-  "keywords": ["aic", "agents", "bootstrap", "http"],
+  "keywords": [
+    "aic",
+    "agents",
+    "bootstrap",
+    "http"
+  ],
   "main": "./dist/ai-bootstrap-http/src/index.js",
   "types": "./dist/ai-bootstrap-http/src/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/ai-bootstrap-http/src/index.d.ts",
