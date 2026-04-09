@@ -37,39 +37,6 @@ These approaches fail unpredictably. They retry wrong elements, misfire modals, 
 
 ---
 
-![How AIC Works](./docs/images/aic_how_it_works.png)
-
----
-
-## ⚡ The Proof Is In The Numbers
-
-We ran a real browser agent benchmark on the [TailAdmin dashboard](./examples/tailadmin-dashboard) using **Claude Sonnet 4.6**. Here's what happened:
-
-![Benchmark Results](./docs/images/aic_benchmark_results.png)
-
-### 📅 Calendar Event Creation
-
-| Metric | Baseline Agent | AIC-Powered Agent | Improvement |
-|--------|:--------------:|:-----------------:|:-----------:|
-| ✅ Success Rate | 33.3% | **100%** | +66.7pp |
-| ⏱️ Median Time | 134s | **64s** | 52% faster |
-| 🖱️ Median Steps | 12 | **3** | 75% fewer |
-| 🔁 Retries | 2 | **0** | 100% reduction |
-
-### 👤 Profile Edit
-
-| Metric | Baseline Agent | AIC-Powered Agent | Improvement |
-|--------|:--------------:|:-----------------:|:-----------:|
-| ✅ Success Rate | 100% | **100%** | maintained |
-| ⏱️ Median Time | 99s | **70s** | 29% faster |
-| 🖱️ Median Steps | 20 | **6** | 70% fewer |
-
-> These are real browser-agent runs — not synthetic tests, not simulations. The agent opened a browser, navigated the UI, filled forms, and verified results. [Full report →](./docs/tailadmin-benchmark-claude-2026-04-02.md)
-
-We also ran a real-app adoption benchmark on a patched local fork of **Twenty CRM**. The current official measured slice is green on detail navigation, destructive safety, record-scoped note creation, record-scoped task creation, a list-level sort workflow, a full list-level filter workflow, record-level stage mutation, and active filter clear, with AIC improving contract correctness from `0.40 -> 0.90` on detail navigation, from `0.60 -> 1.00` on destructive cancel, from `0.35 -> 0.95` on note creation, from `0.40 -> 0.95` on task creation, from `0.45 -> 0.95` on list sort plus record open, from `0.50 -> 0.95` on list filter plus record open, from `0.50 -> 0.90` on stage mutation, and from `0.55 -> 1.00` on list filter clear. [Twenty report →](./benchmarks/twenty-adoption/benchmark-report-official.md)
-
----
-
 ## 🗺️ How AIC Works
 
 AIC adds a thin layer of *explicit semantics* to your app. Think of it as giving every important control a name tag, a job description, and a risk rating — in a format that agents can read directly.
@@ -119,6 +86,10 @@ Agent: "Which element deletes an order?"
 AIC:   "agentId=order.delete, risk=critical, confirmation required"
 Agent: ✅ Executes safely
 ```
+
+---
+
+![How AIC Works](./docs/images/aic_how_it_works.png)
 
 ---
 
@@ -251,6 +222,37 @@ When those commands pass, you have the minimum AIC adoption loop working:
 - a doctor report with no blocking errors
 
 For the copyable app-integration path, use [Adopt AIC In An Existing App](./docs/adopt-existing-app.md).
+
+## 📈 Benchmarks And Proof
+
+If you want proof before adoption, start with these:
+- [TailAdmin Benchmark Report](./docs/tailadmin-benchmark-claude-2026-04-02.md)
+- [Twenty Official Benchmark Report](./benchmarks/twenty-adoption/benchmark-report-official.md)
+
+We ran a real browser agent benchmark on the [TailAdmin dashboard](./examples/tailadmin-dashboard) using **Claude Sonnet 4.6**.
+
+![Benchmark Results](./docs/images/aic_benchmark_results.png)
+
+### 📅 Calendar Event Creation
+
+| Metric | Baseline Agent | AIC-Powered Agent | Improvement |
+|--------|:--------------:|:-----------------:|:-----------:|
+| ✅ Success Rate | 33.3% | **100%** | +66.7pp |
+| ⏱️ Median Time | 134s | **64s** | 52% faster |
+| 🖱️ Median Steps | 12 | **3** | 75% fewer |
+| 🔁 Retries | 2 | **0** | 100% reduction |
+
+### 👤 Profile Edit
+
+| Metric | Baseline Agent | AIC-Powered Agent | Improvement |
+|--------|:--------------:|:-----------------:|:-----------:|
+| ✅ Success Rate | 100% | **100%** | maintained |
+| ⏱️ Median Time | 99s | **70s** | 29% faster |
+| 🖱️ Median Steps | 20 | **6** | 70% fewer |
+
+These are real browser-agent runs. The agent opened a browser, navigated the UI, filled forms, and verified results.
+
+We also ran a real-app adoption benchmark on a patched local fork of **Twenty CRM**. The current official measured slice is green on detail navigation, destructive safety, record-scoped note creation, record-scoped task creation, list sort plus record open, list filter plus record open, record-level stage mutation, and active filter clear. [Twenty report →](./benchmarks/twenty-adoption/benchmark-report-official.md)
 
 ## 🔄 The Three Workflows
 
