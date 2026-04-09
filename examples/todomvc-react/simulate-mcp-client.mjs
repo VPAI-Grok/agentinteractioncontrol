@@ -1,69 +1,50 @@
-import { spawn } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
-import path from 'node:path';
+import { writeFile } from "node:fs/promises";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import path from "node:path";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const mcpServerPath = path.resolve(__dirname, '../../packages/mcp-server/dist/mcp-server/src/index.js');
+const repoRoot = path.resolve(__dirname, "../..");
+const mcpToolsRoot = path.resolve(repoRoot, "packages/mcp-server/dist/mcp-server/src/tools");
 
-const mcpProcess = spawn(process.execPath, [mcpServerPath], {
-  stdio: ['pipe', 'pipe', 'inherit']
-});
+const { handleDiscover } = await import(pathToFileURL(path.join(mcpToolsRoot, "discover.js")).href);
+const { handleListElements } = await import(
+  pathToFileURL(path.join(mcpToolsRoot, "list-elements.js")).href
+);
+const { handleUiState } = await import(pathToFileURL(path.join(mcpToolsRoot, "ui-state.js")).href);
+const { handleWorkflows } = await import(pathToFileURL(path.join(mcpToolsRoot, "workflows.js")).href);
+const { handleActions } = await import(pathToFileURL(path.join(mcpToolsRoot, "actions.js")).href);
 
-let messageId = 1;
+const baseUrl = process.env.AIC_BASE_URL ?? "http://localhost:5173";
+const outputFile = path.resolve(__dirname, "mcp-simulation-result.json");
 
-function sendRequest(method, params) {
-  const req = {
-    jsonrpc: '2.0',
-    id: messageId++,
-    method,
-    params
+async function main() {
+  console.log(`Simulating MCP tool usage for TodoMVC at ${baseUrl}...`);
+
+  const discover = JSON.parse(await handleDiscover({ base_url: baseUrl }));
+  const elements = JSON.parse(
+    await handleListElements({
+      base_url: baseUrl,
+      actionable_only: true
+    })
+  );
+  const uiState = JSON.parse(await handleUiState({ base_url: baseUrl }));
+  const workflows = JSON.parse(await handleWorkflows({ base_url: baseUrl }));
+  const actions = JSON.parse(await handleActions({ base_url: baseUrl }));
+
+  const result = {
+    actions,
+    base_url: baseUrl,
+    discover,
+    elements,
+    ui_state: uiState,
+    workflows
   };
-  mcpProcess.stdin.write(JSON.stringify(req) + '\n');
+
+  await writeFile(outputFile, `${JSON.stringify(result, null, 2)}\n`, "utf8");
+
+  console.log(`Wrote MCP simulation result to ${outputFile}`);
+  console.log(`Discovered app: ${discover.app?.name ?? "unknown"}`);
+  console.log(`Actionable elements returned: ${elements.returned ?? 0}`);
 }
 
-let responseBuffer = '';
-
-mcpProcess.stdout.on('data', (data) => {
-  responseBuffer += data.toString();
-  
-  // MCP messages are newline delimited JSON
-  const lines = responseBuffer.split('\n');
-  responseBuffer = lines.pop(); // Keep the last incomplete line
-  
-  for (const line of lines) {
-    if (!line.trim()) continue;
-    try {
-      const response = JSON.parse(line);
-      if (response.id === 2) {
-        console.log('\n--- MCP Result ---');
-        console.log(JSON.stringify(response.result, null, 2));
-        mcpProcess.kill();
-        process.exit(0);
-      } else {
-        console.log('\n--- MCP Server Response ---');
-        console.log(`Response received for id: ${response.id}`);
-        console.log('---------------------------\n');
-      }
-    } catch (e) {
-      console.error('Failed to parse response:', line, e);
-    }
-  }
-});
-
-console.log('Simulating MCP Client connection to TodoMVC...');
-
-// 1. Ask for tools
-sendRequest('tools/list', {});
-
-// 2. Query the elements tool for TodoMVC
-setTimeout(() => {
-  const callArgs = {
-    name: 'list_aic_elements',
-    arguments: {
-      base_url: 'http://localhost:5173',
-      actionable_only: true
-    }
-  };
-  console.log('Sending args:', callArgs);
-  sendRequest('tools/call', callArgs);
-}, 1000);
+void main();

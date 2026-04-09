@@ -32,16 +32,22 @@ Here is the repo's canonical Next.js AIC starter. It demonstrates generated mani
 
 5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Simulating the Agent Connection (MCP)
+## Simulating MCP Tool Usage
 
-To verify the MCP Server integration against this Next.js app:
+To verify the MCP integration layer against this Next.js app:
 
 1. Keep the Next.js developer server running on `localhost:3000`.
 2. In a new terminal within this directory, run the simulation script:
    ```bash
    node simulate-mcp-client.mjs
    ```
-3. The script connects to the AIC MCP Server over `stdio` and lists actionable elements extracted directly from the generated static files.
+3. The script calls the same MCP tool handlers shipped in `@aicorg/mcp-server` against the running app and writes the result bundle to `mcp-simulation-result.json`.
+
+You can override the target with:
+
+```bash
+AIC_BASE_URL=http://localhost:3000 node simulate-mcp-client.mjs
+```
 
 ## Useful Commands
 
