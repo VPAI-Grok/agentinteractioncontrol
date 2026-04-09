@@ -189,6 +189,7 @@ const { attributes } = useAICElement({
 | 🛠️ Patch a real Twenty fork | [Twenty Local Integration Notes](./benchmarks/twenty-adoption/local-integration-notes.md) |
 | 🧪 See a TodoMVC MCP benchmark | [TodoMVC Example](./examples/todomvc-react) |
 | 🤖 Use AI to bootstrap annotations | [Bootstrap Example](./examples/bootstrap-openai) |
+| 📣 Read launch/adoption/proof posts | [AIC Updates](./docs/updates.md) |
 | 👩‍💻 Onboard a coding agent (Claude, Gemini, Copilot) | [Coding Agent Onboarding](./docs/coding-agents.md) |
 | 📦 Browse all packages | [npm Packages](./docs/npm-packages.md) |
 | 🔬 See what's currently supported | [Supported Today](./docs/supported-today.md) |

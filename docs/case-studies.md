@@ -1,8 +1,8 @@
-# AIC Case Studies
+# 📚 AIC Case Studies
 
 Use this page when you want proof that AIC works on real agent workflows without turning the main README into a benchmark dump.
 
-## 1. TailAdmin Dashboard
+## 1. 📅 TailAdmin Dashboard
 
 TailAdmin is the clearest browser-agent proof case in this repo.
 
@@ -16,10 +16,10 @@ Strongest results:
 - `profile_modal_edit` stayed at `100.0%` success while reducing time and steps materially
 
 What this proves:
-- AIC can make a realistic browser flow reliable, not just slightly faster
-- AIC is especially useful on modal and calendar workflows where agents normally guess
+- ✅ AIC can make a realistic browser flow reliable, not just slightly faster
+- 🎯 AIC is especially useful on modal and calendar workflows where agents normally guess
 
-## 2. Twenty CRM
+## 2. 🏢 Twenty CRM
 
 Twenty is the strongest real-app adoption proof in this repo.
 
@@ -39,11 +39,11 @@ The current official measured slice is green on:
 - list filter clear
 
 What this proves:
-- AIC can be adopted into a real open-source CRM, not just repo-owned demos
-- the main gain is contract correctness and safety, not just fewer clicks
-- destructive actions, exact-record targeting, and workflow boundaries benefit the most
+- ✅ AIC can be adopted into a real open-source CRM, not just repo-owned demos
+- 🛡️ the main gain is contract correctness and safety, not just fewer clicks
+- 🎯 destructive actions, exact-record targeting, and workflow boundaries benefit the most
 
-## 3. How To Read These Proofs
+## 3. 🧠 How To Read These Proofs
 
 TailAdmin answers:
 - does AIC help a real browser agent operate an app more reliably?
