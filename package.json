@@ -25,6 +25,7 @@
     "release:publish": "changeset publish --tag alpha",
     "version:packages": "changeset version",
     "smoke:adoption": "node scripts/smoke-adoption.mjs",
+    "smoke:init": "node scripts/smoke-init.mjs",
     "smoke:mcp": "node scripts/smoke-mcp.mjs",
     "test": "pnpm build && pnpm test:contracts",
     "test:contracts": "node --test tests/*.test.mjs",

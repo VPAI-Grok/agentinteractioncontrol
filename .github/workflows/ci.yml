@@ -37,6 +37,9 @@ jobs:
       - name: Smoke adoption flow
         run: pnpm smoke:adoption
 
+      - name: Smoke init flow
+        run: pnpm smoke:init
+
       - name: Smoke MCP flow
         run: pnpm smoke:mcp
 
