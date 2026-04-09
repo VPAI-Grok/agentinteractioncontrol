@@ -124,6 +124,10 @@ Agent: ✅ Executes safely
 
 ## 🚀 Quick Start
 
+If you already have a React, Next.js, or Vite app, start here:
+
+- [Adopt AIC In An Existing App](./docs/adopt-existing-app.md)
+
 ### Connect any MCP-compatible AI agent (Claude Desktop, Cursor, etc.)
 
 ```json
@@ -199,6 +203,7 @@ const { attributes } = useAICElement({
 
 | I want to… | Go here |
 |------------|---------|
+| 🧩 Adopt AIC in an existing app | [Adopt AIC In An Existing App](./docs/adopt-existing-app.md) |
 | 🚀 Try AIC in 15 minutes | [Next.js Checkout Example](./examples/nextjs-checkout-demo) |
 | 🚀 Try AIC in 15 minutes with Vite | [Vite CRM Example](./examples/react-basic) |
 | 🤖 Connect Claude Desktop or Cursor | [MCP Server Setup](./docs/mcp-server.md) |
@@ -244,6 +249,8 @@ When those commands pass, you have the minimum AIC adoption loop working:
 - onboarding files for coding agents
 - generated discovery/UI/permissions/workflow artifacts
 - a doctor report with no blocking errors
+
+For the copyable app-integration path, use [Adopt AIC In An Existing App](./docs/adopt-existing-app.md).
 
 ## 🔄 The Three Workflows
 
