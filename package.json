@@ -24,6 +24,7 @@
     "release:alpha": "pnpm version:packages && pnpm release:publish",
     "release:publish": "changeset publish --tag alpha",
     "version:packages": "changeset version",
+    "smoke:adoption": "node scripts/smoke-adoption.mjs",
     "test": "pnpm build && pnpm test:contracts",
     "test:contracts": "node --test tests/*.test.mjs",
     "test:goldens": "pnpm build && node tests/goldens.mjs verify",
